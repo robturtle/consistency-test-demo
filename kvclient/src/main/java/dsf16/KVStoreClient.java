@@ -1,6 +1,5 @@
 package dsf16;
 
-import kvstore.KVStore;
 import kvstore.Result;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
