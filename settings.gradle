@@ -1,0 +1,5 @@
+rootProject.name = 'distro-sys-project'
+include 'thrift-stub'
+include 'kvserver'
+include 'kvclient'
+
