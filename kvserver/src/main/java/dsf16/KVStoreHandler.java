@@ -16,13 +16,13 @@ import static org.slf4j.event.Level.*;
  * It implements the interface provided by the kvstore.thrift.
  * It provides a key-value store for RPC callers.
  */
-public class KVStoreHandler implements KVStore.Iface {
+class KVStoreHandler implements KVStore.Iface {
 
   private static final Logger logger = LoggerFactory.getLogger(KVStoreHandler.class);
 
   private static final ConcurrentMap<String, String> map = new ConcurrentHashMap<>(); // TODO wrap file store
 
-  private static final ErrorResultMaker keyNotFound = new ErrorResultMaker(logger, INFO, kKeyNotFound, "key '%s' not found");
+  private static final ErrorResultMaker keyNotFound = new ErrorResultMaker(logger, INFO, kKeyNotFound, "%s: key '%s' not found");
 
   private static final ErrorResultMaker paramIsNull = new ErrorResultMaker(logger, ERROR, kError, "%s cannot be null");
 
@@ -42,7 +42,7 @@ public class KVStoreHandler implements KVStore.Iface {
     logger.debug(String.format("kvget: %s", key));
 
     if (key == null) { return paramIsNull.make("key"); }
-    if (!map.containsKey(key)) { return keyNotFound.make(key); }
+    if (!map.containsKey(key)) { return keyNotFound.make("kvget", key); }
 
     String value = map.get(key);
     logger.debug(String.format("kvget: value = %s", value));
@@ -54,7 +54,7 @@ public class KVStoreHandler implements KVStore.Iface {
     logger.debug(String.format("kvdelete: %s", key));
 
     if (key == null) { return paramIsNull.make("key"); }
-    if (!map.containsKey(key)) { return keyNotFound.make(key); }
+    if (!map.containsKey(key)) { return keyNotFound.make("kvdelete", key); }
 
     map.remove(key);
     return new Result("", kSuccess, "");
