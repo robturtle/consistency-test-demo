@@ -3,14 +3,15 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project_main.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project_main.iml" group="distro-sys-project" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project_test.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project_test.iml" group="distro-sys-project" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvclient/kvclient.iml" filepath="$PROJECT_DIR$/.idea/modules/kvclient/kvclient.iml" group="kvclient" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvclient/kvclient_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kvclient/kvclient_main.iml" group="kvclient" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvclient/kvclient_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kvclient/kvclient_test.iml" group="kvclient" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvserver/kvserver.iml" filepath="$PROJECT_DIR$/.idea/modules/kvserver/kvserver.iml" group="kvserver" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvserver/kvserver_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kvserver/kvserver_main.iml" group="kvserver" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvserver/kvserver_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kvserver/kvserver_test.iml" group="kvserver" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvstore/kvstore.iml" filepath="$PROJECT_DIR$/.idea/modules/kvstore/kvstore.iml" group="kvstore" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvstore/kvstore_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kvstore/kvstore_main.iml" group="kvstore" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvstore/kvstore_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kvstore/kvstore_test.iml" group="kvstore" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/thrift-stub/thrift-stub.iml" filepath="$PROJECT_DIR$/.idea/modules/thrift-stub/thrift-stub.iml" group="thrift-stub" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/thrift-stub/thrift-stub_main.iml" filepath="$PROJECT_DIR$/.idea/modules/thrift-stub/thrift-stub_main.iml" group="thrift-stub" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/thrift-stub/thrift-stub_test.iml" filepath="$PROJECT_DIR$/.idea/modules/thrift-stub/thrift-stub_test.iml" group="thrift-stub" />

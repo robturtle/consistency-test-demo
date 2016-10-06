@@ -25,6 +25,8 @@
       <module name="kvclient_test" target="1.8" />
       <module name="kvserver_main" target="1.8" />
       <module name="kvserver_test" target="1.8" />
+      <module name="kvstore_main" target="1.8" />
+      <module name="kvstore_test" target="1.8" />
       <module name="thrift-stub_main" target="1.8" />
       <module name="thrift-stub_test" target="1.8" />
     </bytecodeTargetLevel>
