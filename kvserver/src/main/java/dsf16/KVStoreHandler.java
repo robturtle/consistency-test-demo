@@ -34,7 +34,7 @@ class KVStoreHandler implements KVStore.Iface {
     if (value == null) { return paramIsNull.make("value"); }
 
     map.put(key, value);
-    return new Result(value, kSuccess, "");
+    return new Result("", kSuccess, "");
   }
 
   @Override
