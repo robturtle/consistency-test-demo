@@ -1,5 +1,7 @@
 version '1.0-SNAPSHOT'
 
+apply plugin: 'java'
+
 subprojects {
   group 'edu.nyu.cs9223'
 
@@ -19,3 +21,9 @@ subprojects {
     compile 'ch.qos.logback:logback-core:1.1.+'
   }
 }
+
+task zipFiles(type: Zip) {
+  from 'publish'
+}
+
+build.finalizedBy zipFiles

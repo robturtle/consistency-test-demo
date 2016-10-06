@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project_main.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project_main.iml" group="distro-sys-project" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project_test.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project_test.iml" group="distro-sys-project" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvclient/kvclient.iml" filepath="$PROJECT_DIR$/.idea/modules/kvclient/kvclient.iml" group="kvclient" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvclient/kvclient_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kvclient/kvclient_main.iml" group="kvclient" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kvclient/kvclient_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kvclient/kvclient_test.iml" group="kvclient" />

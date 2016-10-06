@@ -2,7 +2,6 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
-group 'edu.nyu.cs9223'
 version '1.0-SNAPSHOT'
 
 dependencies {
@@ -16,6 +15,12 @@ jar {
   }
 }
 
+task publish(type: Copy) {
+  from 'build/libs/kvclient.jar'
+  into '../publish'
+}
+
 shadowJar.archiveName = 'kvclient.jar'
+shadowJar.finalizedBy publish
 
 build.finalizedBy shadowJar
