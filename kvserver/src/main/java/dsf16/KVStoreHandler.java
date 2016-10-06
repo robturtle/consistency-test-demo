@@ -23,7 +23,7 @@ class KVStoreHandler implements KVStore.Iface {
 
   private static final ConcurrentMap<String, String> map = new ConcurrentHashMap<>(); // TODO wrap file store
 
-  private static final ErrorResultMaker keyNotFound = new ErrorResultMaker(logger, INFO, kKeyNotFound, "%s: key '%s' not found");
+  private static final ErrorResultMaker keyNotFound = new ErrorResultMaker(logger, WARN, kKeyNotFound, "%s: key '%s' not found");
 
   private static final ErrorResultMaker paramIsNull = new ErrorResultMaker(logger, ERROR, kError, "%s cannot be null");
 
