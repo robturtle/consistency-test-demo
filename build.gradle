@@ -22,8 +22,6 @@ subprojects {
   }
 }
 
-task zipFiles(type: Zip) {
+task publish(type: Zip) {
   from 'publish'
 }
-
-build.finalizedBy zipFiles
