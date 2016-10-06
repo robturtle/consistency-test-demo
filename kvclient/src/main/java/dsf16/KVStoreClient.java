@@ -30,7 +30,7 @@ public class KVStoreClient {
 
       transport.close();
     } catch (TException x) {
-      System.err.println(x.getMessage());
+      x.printStackTrace();
       System.exit(kError.ordinal());
     }
   }

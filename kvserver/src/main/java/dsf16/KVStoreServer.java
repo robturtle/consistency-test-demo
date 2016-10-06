@@ -34,6 +34,7 @@ public class KVStoreServer {
 
     } catch (TTransportException e) {
       logger.error(e.getMessage());
+      e.printStackTrace();
     }
   }
 }
