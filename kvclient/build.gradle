@@ -17,3 +17,5 @@ jar {
 }
 
 shadowJar.archiveName = 'kvclient.jar'
+
+build.finalizedBy shadowJar

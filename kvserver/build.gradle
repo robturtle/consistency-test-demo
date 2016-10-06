@@ -16,3 +16,5 @@ jar {
 }
 
 shadowJar.archiveName = 'kvserver.jar'
+
+build.finalizedBy shadowJar
