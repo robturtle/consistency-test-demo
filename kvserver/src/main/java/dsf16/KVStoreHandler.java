@@ -18,6 +18,7 @@ import static org.slf4j.event.Level.*;
  */
 class KVStoreHandler implements KVStore.Iface {
 
+  // TODO log incoming request's IP in every function call
   private static final Logger logger = LoggerFactory.getLogger(KVStoreHandler.class);
 
   private static final ConcurrentMap<String, String> map = new ConcurrentHashMap<>(); // TODO wrap file store
@@ -28,7 +29,7 @@ class KVStoreHandler implements KVStore.Iface {
 
   @Override
   public Result kvset(String key, String value) throws TException {
-    logger.debug(String.format("kvset: key = '%s', value = '%s'", key, value));
+    logger.info(String.format("kvset: key = '%s', value = '%s'", key, value));
 
     if (key == null) { return paramIsNull.make("key"); }
     if (value == null) { return paramIsNull.make("value"); }
@@ -39,19 +40,19 @@ class KVStoreHandler implements KVStore.Iface {
 
   @Override
   public Result kvget(String key) throws TException {
-    logger.debug(String.format("kvget: %s", key));
+    logger.info(String.format("kvget: %s", key));
 
     if (key == null) { return paramIsNull.make("key"); }
     if (!map.containsKey(key)) { return keyNotFound.make("kvget", key); }
 
     String value = map.get(key);
-    logger.debug(String.format("kvget: value = %s", value));
+    logger.info(String.format("kvget: value = %s", value));
     return new Result(value, kSuccess, "");
   }
 
   @Override
   public Result kvdelete(String key) throws TException {
-    logger.debug(String.format("kvdelete: %s", key));
+    logger.info(String.format("kvdelete: %s", key));
 
     if (key == null) { return paramIsNull.make("key"); }
     if (!map.containsKey(key)) { return keyNotFound.make("kvdelete", key); }
