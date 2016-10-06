@@ -1,5 +1,6 @@
 package dsf16;
 
+import args4j.WellBehavedStringArrayOptionHandler;
 import kvstore.Result;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -9,11 +10,11 @@ import org.apache.thrift.transport.TTransport;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.spi.StringArrayOptionHandler;
 
 import java.net.URI;
 
 import static kvstore.ErrorCode.kError;
+import static kvstore.ErrorCode.kSuccess;
 import static kvstore.KVStore.*;
 
 /**
@@ -27,7 +28,7 @@ public class KVStoreClient {
   private URI server;
 
   @Option(name = "-set", usage = "set a new KEY-VALUE pair", metaVar = "KEY VALUE",
-          handler = StringArrayOptionHandler.class)
+          handler = WellBehavedStringArrayOptionHandler.class)
   private String[] setArgs = new String[0];
 
   @Option(name = "-get", usage = "get value of that KEY", metaVar = "KEY")
@@ -91,29 +92,44 @@ public class KVStoreClient {
       TProtocol protocol = new TBinaryProtocol(transport);
       Client client = new Client(protocol);
 
-      perform(client, args);
+      perform(client);
 
       transport.close();
     } catch (TException x) {
-      x.printStackTrace();
+      System.err.println("ERROR during transmission: " + x.getMessage());
       System.exit(kError.ordinal());
     }
 
   }
 
-  private void perform(Client client, String[] args) throws TException {
-    printResult(client.kvget("Yang"));
-    printResult(client.kvset("Yang", "Liu"));
-    printResult(client.kvget("Yang"));
-    printResult(client.kvget("Yang"));
-    printResult(client.kvset("Yang", "Ming"));
-    printResult(client.kvdelete("Yang"));
-    printResult(client.kvdelete("Yang"));
-    printResult(client.kvget("Yang"));
+  private void perform(Client client) throws TException {
+    Result result;
+    if (operation == setArgs) {
+      result = client.kvset(setArgs[0], setArgs[1]);
+
+    } else if (operation == getKey) {
+      result = client.kvget(getKey);
+
+    } else if (operation == delKey) {
+      result = client.kvdelete(delKey);
+
+    } else {
+      throw new AssertionError("operation should in {setArgs, getKey, delKey}");
+    }
+
+    printResult(result);
   }
 
   private void printResult(Result result) {
-    System.out.printf("'%s', %s, '%s'%n", result.value, result.error, result.errortext);
+
+    if (result.error == kSuccess) {
+      if (!result.value.isEmpty()) { System.out.println(result.value); }
+
+    } else {
+      System.err.println(result.errortext);
+      System.exit(result.error.ordinal());
+    }
+
   }
 
 }
