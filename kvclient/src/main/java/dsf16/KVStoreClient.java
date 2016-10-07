@@ -1,17 +1,23 @@
 package dsf16;
 
-import args4j.WellBehavedStringArrayOptionHandler;
+import argparse.ArgumentParseException;
+import argparse.ArgumentParser;
+import argparse.argument.ArgumentConsumer;
+import argparse.argument.FieldSetter;
+import argparse.option.ExclusiveOptionGroup;
+import argparse.option.SingleOption;
+import argparse.type.TypeBuilderRegistry;
 import kvstore.Result;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import static kvstore.ErrorCode.kError;
 import static kvstore.ErrorCode.kSuccess;
@@ -22,77 +28,70 @@ import static kvstore.KVStore.*;
  */
 public class KVStoreClient {
 
-  @Option(name = "-server", usage = "specify the URI of the kvstore server")
-  private String address; // TODO set default from property
+  @FunctionalInterface
+  private interface ResultQuery {
+    Result apply(Client client) throws TException;
+  }
+
+  private static final ArgumentParser parser = new ArgumentParser();
+
+  private static final
+  Map<String, Function<KVStoreClient, ResultQuery>> operations = new HashMap<>();
+
+  static {
+    TypeBuilderRegistry.register(URI.class, s -> URI.create("my://" + s));
+
+    Function<String, ArgumentConsumer> opSetter = operationType -> (o, args) -> {
+      ResultQuery query = operations.get(operationType).apply((KVStoreClient) o);
+      new FieldSetter("operation").set(o, query);
+    };
+
+    FieldSetter serverSetter = new FieldSetter("server",
+      o -> ((URI)o).getHost() != null && ((URI)o).getPort() != -1);
+
+    parser.addOption(new SingleOption("-server", serverSetter));
+    parser.addOption(
+      new ExclusiveOptionGroup("operations")
+      .addOption(new SingleOption("-set", new FieldSetter("key"), new FieldSetter("value"), opSetter.apply("-set")))
+      .addOption(new SingleOption("-get", new FieldSetter("key"), opSetter.apply("-get")))
+      .addOption(new SingleOption("-del", new FieldSetter("key"), opSetter.apply("-del")))
+    );
+
+    operations.put("-get", o -> client -> client.kvget(o.key));
+    operations.put("-set", o -> client -> client.kvset(o.key, o.value));
+    operations.put("-del", o -> client -> client.kvdelete(o.key));
+  }
 
   private URI server;
 
-  @Option(name = "-set", usage = "set a new KEY-VALUE pair", metaVar = "KEY VALUE",
-          handler = WellBehavedStringArrayOptionHandler.class)
-  private String[] setArgs = new String[0];
+  private String key;
 
-  @Option(name = "-get", usage = "get value of that KEY", metaVar = "KEY")
-  private String getKey;
+  private String value;
 
-  @Option(name = "-del", usage = "delete that KEY", metaVar = "KEY")
-  private String delKey;
-
-  private Object operation;
+  private ResultQuery operation;
 
   public static void main(String[] args) {
     new KVStoreClient().doMain(args);
   }
 
-  private void validateArgs() throws IllegalArgumentException {
-    if (address == null) {
-      throw new IllegalArgumentException("must set server address");
-    }
-    server = URI.create("my://" + address);
-    if (server.getHost() == null || server.getPort() == -1) {
-      throw new IllegalArgumentException("bad URI format");
-    }
-
-    int n = 0;
-    if (setArgs.length != 0) { operation = setArgs; n++; }
-    if (getKey != null) { operation = getKey; n++; }
-    if (delKey != null) { operation = delKey; n++; }
-    if (n != 1) {
-      throw new IllegalArgumentException("must specify only one operation");
-    }
-
-    if (operation == setArgs && setArgs.length != 2) {
-      throw new IllegalArgumentException("-set expect exactly 2 arguments");
-    }
-
-  }
-
   private void doMain(String[] args) {
-
-    CmdLineParser parser = new CmdLineParser(this);
     try {
-
-      parser.parseArgument(args);
-      validateArgs();
-
-    } catch (CmdLineException | IllegalArgumentException e) {
+      parser.parse(this, args);
+    } catch (ArgumentParseException e) {
       System.err.println("ERROR: " + e.getMessage());
-      System.err.println(
-        "\nkvclient [-server URI] " +
-        "{ -set KEY VALUE | -get KEY | -del KEY }\n"
-      );
-      parser.printUsage(System.err);
-      System.exit(kError.ordinal());
+      System.exit(-1);
     }
 
     try {
-      final int milliTimeout = 1000; // TODO set to 5000
+      final int milliTimeout = 3000;
       TTransport transport = new TSocket(server.getHost(), server.getPort(), milliTimeout);
       transport.open();
 
       TProtocol protocol = new TBinaryProtocol(transport);
       Client client = new Client(protocol);
 
-      perform(client);
+      Result result = operation.apply(client);
+      printResult(result);
 
       transport.close();
     } catch (TException x) {
@@ -100,24 +99,6 @@ public class KVStoreClient {
       System.exit(kError.ordinal());
     }
 
-  }
-
-  private void perform(Client client) throws TException {
-    Result result;
-    if (operation == setArgs) {
-      result = client.kvset(setArgs[0], setArgs[1]);
-
-    } else if (operation == getKey) {
-      result = client.kvget(getKey);
-
-    } else if (operation == delKey) {
-      result = client.kvdelete(delKey);
-
-    } else {
-      throw new AssertionError("operation should in {setArgs, getKey, delKey}");
-    }
-
-    printResult(result);
   }
 
   private void printResult(Result result) {
