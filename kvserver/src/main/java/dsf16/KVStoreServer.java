@@ -26,10 +26,11 @@ public class KVStoreServer {
 
   private static void serve(Processor<KVStoreHandler> processor) {
     try {
-      TServerTransport transport = new TServerSocket(9090); // TODO read port from property file
+      final int port = 9090;
+      TServerTransport transport = new TServerSocket(port); // TODO read port from property file
       TServer server = new TSimpleServer(new Args(transport).processor(processor));
 
-      logger.info("Starting kvstore server...");
+      logger.info(String.format("Starting kvstore server at %d ...", port));
       server.serve();
 
     } catch (TTransportException e) {
