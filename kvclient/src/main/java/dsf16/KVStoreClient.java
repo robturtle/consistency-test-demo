@@ -51,7 +51,7 @@ public class KVStoreClient {
 
     parser.addOption(new SingleOption("-server", serverSetter));
     parser.addOption(
-      new ExclusiveOptionGroup("operations")
+      new ExclusiveOptionGroup("operation")
       .addOption(new SingleOption("-set", new FieldSetter("key"), new FieldSetter("value"), opSetter.apply("-set")))
       .addOption(new SingleOption("-get", new FieldSetter("key"), opSetter.apply("-get")))
       .addOption(new SingleOption("-del", new FieldSetter("key"), opSetter.apply("-del")))
@@ -117,10 +117,11 @@ public class KVStoreClient {
   // TODO make parser auto generate this
   private void printUsage() {
     System.out.println("kvclient -server HOST:PORT { -set KEY VALUE | -get KEY | -del KEY }\n");
-    System.out.println("-server HOST:PORT : specify the location of the server");
-    System.out.println("-set KEY VALUE    : set a new KEY-VALUE pair upto the server");
-    System.out.println("-get KEY          : get the value related to that KEY");
-    System.out.println("-del KEY          : delete the KEY-value pair");
+    System.out.println("-server HOST:PORT : specify the location of the server\n");
+    System.out.println("operation");
+    System.out.println("  -set KEY VALUE    : set a new KEY-VALUE pair upto the server");
+    System.out.println("  -get KEY          : get the value related to that KEY");
+    System.out.println("  -del KEY          : delete the KEY-value pair");
   }
 
 }
