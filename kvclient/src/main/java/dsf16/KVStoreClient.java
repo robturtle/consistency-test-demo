@@ -79,6 +79,7 @@ public class KVStoreClient {
       parser.parse(this, args);
     } catch (ArgumentParseException e) {
       System.err.println("ERROR: " + e.getMessage());
+      printUsage();
       System.exit(-1);
     }
 
@@ -111,6 +112,15 @@ public class KVStoreClient {
       System.exit(result.error.ordinal());
     }
 
+  }
+
+  // TODO make parser auto generate this
+  private void printUsage() {
+    System.out.println("kvclient -server HOST:PORT { -set KEY VALUE | -get KEY | -del KEY }\n");
+    System.out.println("-server HOST:PORT : specify the location of the server");
+    System.out.println("-set KEY VALUE    : set a new KEY-VALUE pair upto the server");
+    System.out.println("-get KEY          : get the value related to that KEY");
+    System.out.println("-del KEY          : delete the KEY-value pair");
   }
 
 }
