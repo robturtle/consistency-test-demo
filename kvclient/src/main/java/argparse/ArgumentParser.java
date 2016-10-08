@@ -21,8 +21,8 @@ public class ArgumentParser {
     return this;
   }
 
-  public ArgumentParser require(boolean isRequired) { // TODO change to optional
-    group.require(isRequired);
+  public ArgumentParser optional(boolean isOptional) {
+    group.optional(isOptional);
     return this;
   }
 

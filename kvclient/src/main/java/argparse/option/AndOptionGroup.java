@@ -51,16 +51,16 @@ public class AndOptionGroup extends AbstractOption {
   public AndOptionGroup addOption(Option option) {
     last = option;
     opts.add(option);
-    require(true);
+    optional(false);
     return this;
   }
 
-  public AndOptionGroup require(boolean isRequired) {
+  public AndOptionGroup optional(boolean isOptional) {
     if (last == null) {
       throw new AssertionError("There is no previous selected Option");
     }
 
-    if (isRequired) {
+    if (!isOptional) {
       required.put(last, false);
     } else {
       required.remove(last);

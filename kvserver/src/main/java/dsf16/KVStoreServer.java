@@ -27,7 +27,7 @@ public class KVStoreServer {
   private static void serve(Processor<KVStoreHandler> processor) {
     try {
       final int port = 9090;
-      TServerTransport transport = new TServerSocket(port); // TODO read port from property file
+      TServerTransport transport = new TServerSocket(port); // TODO specify from command line
       TServer server = new TSimpleServer(new Args(transport).processor(processor));
 
       logger.info(String.format("Starting kvstore server at %d ...", port));
