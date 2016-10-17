@@ -29,7 +29,7 @@ public class KVStoreServer {
       final int port = 9090;
       TServerTransport transport = new TServerSocket(port); // TODO specify from command line
       TServer server = new TSimpleServer(new Args(transport).processor(processor));
-
+      server.setServerEventHandler(new ServerEventHandlerForIP());
       logger.info(String.format("Starting kvstore server at %d ...", port));
       server.serve();
 
