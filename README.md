@@ -2,7 +2,7 @@
 
 ## Prerequisites
 ```shell
-// For other Linux distro, please install them with proper installer
+# For other Linux distro, please install them with proper installer
 brew install thrift
 brew install gradle
 ```
