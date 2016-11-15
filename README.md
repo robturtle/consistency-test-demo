@@ -1,7 +1,8 @@
 # Distributed System Project
 
 ## Prerequisites
-`thrift-compiler` is the only dependency. Please install it with a proper installer. For instance, `brew install thrift` on OS X, or `sudo apt-get install thrift-compiler` on Debian/Ubuntu.
+- Java 8
+- `thrift-compiler`. Please install it with a proper installer. For instance, `brew install thrift` on OS X, or `sudo apt-get install thrift-compiler` on Debian/Ubuntu.
 
 This project is built by Gradle, other requiring libraries/executables will be auto downloaded while building. The `gradle` itself can also be bootstrapped from the `gradlew` script, which means we do not need to install `gradle` manually.
 
