@@ -34,7 +34,7 @@ cd distributed-system-project
 ./gradlew build # on *inx, or
 ./gradlew.bat build # on Windows
 ```
-## Build with your own gradle
+## (Alternative) Build with your own gradle
 If you intend to build the project with your own `gradle` executable, please make sure it's compatible with the `./gradlew -version`. My build envrionment is as follows:
 
 ```shell
@@ -52,6 +52,8 @@ Ant:          Apache Ant(TM) version 1.9.6 compiled on June 29 2015
 JVM:          1.8.0_91 (Oracle Corporation 25.91-b14)
 OS:           Mac OS X 10.11.6 x86_64
 ```
+
+## Executables
 
 After the build process, the all-in-one executable jar files and its shortcut startup scripts are reside in `publish` folder.
 
