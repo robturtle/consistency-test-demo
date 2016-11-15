@@ -18,7 +18,7 @@ Thrift version 0.9.3
 
 This project is built by Gradle, other requiring libraries/executables will be auto downloaded while building. The `gradle` itself can also be bootstrapped from the `gradlew` script, which means we do not need to install `gradle` manually.
 
-## Build the project
+## Build the project (Fastest way)
 > *You can safely skip this section if you do not want to build it in IntelliJ*:  
   
 > NOTE for later OS X, `brew` install things on `/usr/local`,
@@ -34,8 +34,8 @@ cd distributed-system-project
 ./gradlew build # on *inx, or
 ./gradlew.bat build # on Windows
 ```
-
-*NOTE*: If you intend to build the project with your own `gradle` executable, please make sure it's compatible with the `./gradlew -version`:
+## Build with your own gradle
+If you intend to build the project with your own `gradle` executable, please make sure it's compatible with the `./gradlew -version`. My build envrionment is as follows:
 
 ```shell
 ./gradlew -version
@@ -64,7 +64,7 @@ cd publish
 ## Compress into zip
 
 ```shell
-gradle publish
+./gradlew publish
 ```
 
 The zip file will reside in `build/distributions/`, consists all files in `publish` folder.
