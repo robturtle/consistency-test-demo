@@ -23,6 +23,8 @@ cd distributed-system-project
 ./gradlew.bat build # on Windows
 ```
 
+*NOTE*: If you intend to build the project with your own `gradle` executable, please make sure its version > 3.0.
+
 After the build process, the all-in-one executable jar files and its shortcut startup scripts are reside in `publish` folder.
 
 ```shell
