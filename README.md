@@ -18,14 +18,8 @@ Thrift version 0.9.3
 
 This project is built by Gradle, other requiring libraries/executables will be auto downloaded while building. The `gradle` itself can also be bootstrapped from the `gradlew` script, which means we do not need to install `gradle` manually.
 
-## Build the project (Fastest way)
-> *You can safely skip this section if you do not want to build it in IntelliJ*:  
-  
-> NOTE for later OS X, `brew` install things on `/usr/local`,
-which is not in the default GUI application PATH variable. To fix this, refer to
-[this article](http://depressiverobot.com/2016/02/05/intellij-path.html) to set a proper PATH variable
- so that the thrift compiler can be found inside IntelliJ.
-
+## Build
+### Fastest way
 Building from command line is straight forward:
 
 ```shell
@@ -34,7 +28,7 @@ cd distributed-system-project
 ./gradlew build # on *inx, or
 ./gradlew.bat build # on Windows
 ```
-## (Alternative) Build with your own gradle
+### (Alternative) Build with your own gradle
 If you intend to build the project with your own `gradle` executable, please make sure it's compatible with the `./gradlew -version`. My build envrionment is as follows:
 
 ```shell
@@ -52,6 +46,12 @@ Ant:          Apache Ant(TM) version 1.9.6 compiled on June 29 2015
 JVM:          1.8.0_91 (Oracle Corporation 25.91-b14)
 OS:           Mac OS X 10.11.6 x86_64
 ```
+
+### Troubleshooting when building in IntelliJ
+Note for later OS X, `brew` install things on `/usr/local`,
+which is not in the default GUI application PATH variable. To fix this, refer to
+[this article](http://depressiverobot.com/2016/02/05/intellij-path.html) to set a proper PATH variable
+ so that the thrift compiler can be found inside IntelliJ.
 
 ## Executables
 
