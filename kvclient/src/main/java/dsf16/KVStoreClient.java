@@ -97,6 +97,7 @@ public class KVStoreClient {
       transport.close();
     } catch (TException x) {
       System.err.println("ERROR during transmission: " + x.getMessage());
+      x.printStackTrace();
       System.exit(kError.ordinal());
     }
 
