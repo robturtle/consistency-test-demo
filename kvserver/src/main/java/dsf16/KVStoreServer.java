@@ -3,7 +3,6 @@ package dsf16;
 import kvstore.KVStore;
 import kvstore.KVStore.Processor;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
@@ -22,14 +21,13 @@ public class KVStoreServer {
 
   public static void main(String[] args) {
     KVStore.Iface handler;
-    // example ./kvserver 9091 buggy 1000 2000
-    if (args.length == 4 && args[1].equals("buggy")) {
-      handler = new BuggyKVStoreHandler(
-        Integer.parseInt(args[2]),
-        Integer.parseInt(args[3]));
-    } else {
-      handler = new KVStoreHandler();
+    boolean isBuggy = false;
+    // example ./kvserver 9091 buggy
+    if (args.length >= 2 && args[1].equals("buggy")) {
+      logger.info("Running in buggy mode");
+      isBuggy = true;
     }
+    handler = new KVStoreHandler(isBuggy);
     processor = new Processor<>(handler);
     final int port = Integer.parseInt(args[0]);
     new Thread(() -> serve(processor, port)).start();
@@ -40,7 +38,7 @@ public class KVStoreServer {
       TServerTransport transport = new TServerSocket(port); // TODO specify from command line
       TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(transport).processor(processor));
 
-      logger.info(String.format("Starting kvstore server at %d ...", port));
+      logger.info("Starting kvstore server at {} ...", port);
       server.serve();
 
     } catch (TTransportException e) {

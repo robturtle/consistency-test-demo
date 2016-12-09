@@ -6,11 +6,13 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static kvstore.ErrorCode.*;
-import static org.slf4j.event.Level.*;
+import static org.slf4j.event.Level.ERROR;
+import static org.slf4j.event.Level.WARN;
 
 /**
  * It implements the interface provided by the kvstore.thrift.
@@ -21,11 +23,19 @@ class KVStoreHandler implements KVStore.Iface {
   // TODO log incoming request's IP in every function call
   private static final Logger logger = LoggerFactory.getLogger(KVStoreHandler.class);
 
-  private static final ConcurrentMap<String, String> map = new ConcurrentHashMap<>(); // TODO wrap file store
-
   private static final ErrorResultMaker keyNotFound = new ErrorResultMaker(logger, WARN, kKeyNotFound, "%s: key '%s' not found");
 
   private static final ErrorResultMaker paramIsNull = new ErrorResultMaker(logger, ERROR, kError, "%s cannot be null");
+
+  private final Map<String, String> map; // TODO wrap file store
+
+  KVStoreHandler(boolean isBuggy) {
+    if (isBuggy) {
+      map = new HashMap<>();
+    } else {
+      map = new ConcurrentHashMap<>();
+    }
+  }
 
   @Override
   public Result kvset(String key, String value) throws TException {
