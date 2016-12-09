@@ -29,7 +29,7 @@ class KVStoreHandler implements KVStore.Iface {
 
   @Override
   public Result kvset(String key, String value) throws TException {
-    logger.info(String.format("kvset: key = '%s', value = '%s'", key, value));
+    logger.info("kvset: {} = {}", key, value);
 
     if (key == null) { return paramIsNull.make("key"); }
     if (value == null) { return paramIsNull.make("value"); }
@@ -40,19 +40,17 @@ class KVStoreHandler implements KVStore.Iface {
 
   @Override
   public Result kvget(String key) throws TException {
-    logger.info(String.format("kvget: %s", key));
-
     if (key == null) { return paramIsNull.make("key"); }
     if (!map.containsKey(key)) { return keyNotFound.make("kvget", key); }
 
     String value = map.get(key);
-    logger.info(String.format("kvget: value = %s", value));
+    logger.info("kvget: {} = {}", key, value);
     return new Result(value, kSuccess, "");
   }
 
   @Override
   public Result kvdelete(String key) throws TException {
-    logger.info(String.format("kvdelete: %s", key));
+    logger.info("kvdelete: {}", key);
 
     if (key == null) { return paramIsNull.make("key"); }
     if (!map.containsKey(key)) { return keyNotFound.make("kvdelete", key); }
