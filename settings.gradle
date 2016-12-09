@@ -3,4 +3,5 @@ include 'thrift-stub'
 include 'kvserver'
 include 'kvclient'
 include 'kvstore'
-
+include 'argparse'
+include 'consistency-check'

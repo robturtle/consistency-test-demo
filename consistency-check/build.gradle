@@ -6,21 +6,20 @@ version '1.0'
 
 dependencies {
   compile project(':thrift-stub')
-  compile project(':argparse')
 }
 
 jar {
   manifest {
-    attributes 'Main-Class': 'dsf16.KVStoreClient'
+    attributes 'Main-Class': 'dsf16.KVStoreConsistencyTester'
   }
 }
 
 task publish(type: Copy) {
-  from 'build/libs/kvclient.jar'
+  from 'build/libs/tester.jar'
   into '../publish'
 }
 
-shadowJar.archiveName = 'kvclient.jar'
+shadowJar.archiveName = 'tester.jar'
 shadowJar.finalizedBy publish
 
 build.finalizedBy shadowJar

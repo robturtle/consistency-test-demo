@@ -2,6 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/argparse/argparse.iml" filepath="$PROJECT_DIR$/.idea/modules/argparse/argparse.iml" group="argparse" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/argparse/argparse_main.iml" filepath="$PROJECT_DIR$/.idea/modules/argparse/argparse_main.iml" group="argparse" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/argparse/argparse_test.iml" filepath="$PROJECT_DIR$/.idea/modules/argparse/argparse_test.iml" group="argparse" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/consistency-check/consistency-check.iml" filepath="$PROJECT_DIR$/.idea/modules/consistency-check/consistency-check.iml" group="consistency-check" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/consistency-check/consistency-check_main.iml" filepath="$PROJECT_DIR$/.idea/modules/consistency-check/consistency-check_main.iml" group="consistency-check" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/consistency-check/consistency-check_test.iml" filepath="$PROJECT_DIR$/.idea/modules/consistency-check/consistency-check_test.iml" group="consistency-check" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project_main.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project_main.iml" group="distro-sys-project" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/distro-sys-project_test.iml" filepath="$PROJECT_DIR$/.idea/modules/distro-sys-project_test.iml" group="distro-sys-project" />

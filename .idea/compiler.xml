@@ -19,6 +19,10 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="argparse_main" target="1.8" />
+      <module name="argparse_test" target="1.8" />
+      <module name="consistency-check_main" target="1.8" />
+      <module name="consistency-check_test" target="1.8" />
       <module name="distro-sys-project_main" target="1.8" />
       <module name="distro-sys-project_test" target="1.8" />
       <module name="kvclient_main" target="1.8" />

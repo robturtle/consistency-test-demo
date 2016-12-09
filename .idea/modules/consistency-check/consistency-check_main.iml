@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":kvclient:main" external.linked.project.path="$MODULE_DIR$/../../../kvclient" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="edu.nyu.cs9223" external.system.module.type="sourceSet" external.system.module.version="1.0" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":consistency-check:main" external.linked.project.path="$MODULE_DIR$/../../../consistency-check" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="edu.nyu.cs9223" external.system.module.type="sourceSet" external.system.module.version="1.0" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../../kvclient/build/classes/main" />
+    <output url="file://$MODULE_DIR$/../../../consistency-check/build/classes/main" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../kvclient/src/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../../kvclient/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../kvclient/src/main/resources" type="java-resource" />
+    <content url="file://$MODULE_DIR$/../../../consistency-check/src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../consistency-check/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../consistency-check/src/main/resources" type="java-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -14,7 +14,6 @@
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.1.7" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.1.7" level="project" />
     <orderEntry type="module" module-name="thrift-stub_main" />
-    <orderEntry type="module" module-name="argparse_main" />
     <orderEntry type="library" name="Gradle: org.apache.thrift:libthrift:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.4.1" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore:4.4.1" level="project" />
