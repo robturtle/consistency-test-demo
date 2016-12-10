@@ -60,6 +60,7 @@ public class ArgumentParser {
   public void printUsage(String appname) {
     System.out.print(appname + " ");
     System.out.println(String.join(" ", group.exampleUsage()));
+    System.out.println();
     System.out.println(group.descriptionLine(-1, 0));
   }
 
