@@ -12,8 +12,8 @@
     <orderEntry type="module" module-name="thrift-stub_main" />
     <orderEntry type="library" name="Gradle: com.intellij:annotations:12.0" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.21" level="project" />
-    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.1.7" level="project" />
-    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.1.7" level="project" />
+    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.1.8" level="project" />
+    <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.1.8" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.thrift:libthrift:0.9.3" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.11" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.4.1" level="project" />
