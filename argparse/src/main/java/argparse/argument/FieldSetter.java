@@ -42,10 +42,14 @@ public class FieldSetter implements ArgumentConsumer {
 
   }
 
-  public void set(@NotNull Object target, @NotNull Object value) {
+  public void set(@NotNull Object target, Object value) {
     Class<?> type = target.getClass();
     Field field = findField(target);
     setField(field, type, target, value);
+  }
+
+  public ArgumentConsumer set(Object value) {
+    return (o, args) -> set(o, value);
   }
 
   private Field findField(@NotNull Object target) {
