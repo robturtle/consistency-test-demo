@@ -29,7 +29,7 @@ public class KVStoreServer {
     }
     handler = new KVStoreHandler(isBuggy);
     processor = new Processor<>(handler);
-    final int port = Integer.parseInt(args[0]);
+    final int port = args.length > 0 ? Integer.parseInt(args[0]) : 9090;
     new Thread(() -> serve(processor, port)).start();
   }
 
