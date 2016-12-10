@@ -50,7 +50,7 @@ public class KVStoreClient {
       o -> ((URI)o).getHost() != null && ((URI)o).getPort() != -1);
 
     parser.addOption(new SingleOption("-server", serverSetter))
-      .argPlaceholder("PORT:HOST")
+      .argPlaceholder("HOST:PORT")
       .description("Specify the location of the server");
 
     parser.addOption(
