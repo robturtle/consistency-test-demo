@@ -4,15 +4,14 @@ import argparse.ArgumentParseException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 
 /**
  * The parsing is valid if only one of its options were parsed
  */
-public class ExclusiveOptionGroup extends AbstractOption {
-
-  private final List<Option> opts = new ArrayList<>();
+public class ExclusiveOptionGroup extends AbstractOptionGroup {
 
   private Option selected;
 
@@ -34,9 +33,17 @@ public class ExclusiveOptionGroup extends AbstractOption {
     return false;
   }
 
-  public ExclusiveOptionGroup addOption(Option option) {
-    opts.add(option);
-    return this;
+  @Override
+  public Collection<String> exampleUsage() {
+    Collection<String> parts = new ArrayList<>();
+    parts.add("{");
+    int size = opts.size();
+    for (int i = 0; i < size; i++) {
+      parts.addAll(opts.get(i).exampleUsage());
+      if (i != size - 1) { parts.add("|"); }
+    }
+    parts.add("}");
+    return parts;
   }
 
   public Option getSelected() {

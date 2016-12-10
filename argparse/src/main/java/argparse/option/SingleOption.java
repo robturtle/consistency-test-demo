@@ -5,6 +5,8 @@ import argparse.argument.ArgumentConsumer;
 import argparse.argument.TooFewArgumentException;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 
 /**
@@ -12,6 +14,10 @@ import java.util.Deque;
  * following by zero or more option arguments
  */
 public class SingleOption extends AbstractOption {
+
+  private String descriptionStr = "";
+
+  private String argPlaceholderStr = "";
 
   private final ArgumentConsumer[] consumers;
 
@@ -43,5 +49,38 @@ public class SingleOption extends AbstractOption {
     }
 
     return true;
+  }
+
+  @Override
+  public Collection<String> exampleUsage() {
+    String example = getName();
+    if (!argPlaceholderStr.isEmpty()) { example += ' ' + argPlaceholderStr; }
+    return Collections.singleton(example);
+  }
+
+  @Override
+  public String descriptionLine(int depth, int nameWidth) {
+    String indentation = depth > 0 ? String.format("%" + depth * indentWidthPerDepth + "s", "") : "";
+    String name = nameWidth <= 0 ? getName() : String.format("%-" + nameWidth + "s", getName());
+    return (new StringBuilder()
+      .append(indentation)
+      .append(name).append(' ')
+      .append(descriptionStr)).toString();
+  }
+
+  public String argPlaceholder() {
+    return argPlaceholderStr;
+  }
+
+  public void argPlaceholder(String placeholder) {
+    argPlaceholderStr = placeholder;
+  }
+
+  public String description() {
+    return descriptionStr;
+  }
+
+  public void description(String str) {
+    descriptionStr = str;
   }
 }

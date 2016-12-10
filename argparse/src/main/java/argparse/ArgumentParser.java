@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 
 /**
  * An argument parser contains a set of parsing rules.
@@ -23,6 +24,16 @@ public class ArgumentParser {
 
   public ArgumentParser optional(boolean isOptional) {
     group.optional(isOptional);
+    return this;
+  }
+
+  public ArgumentParser argPlaceholder(String placeholder) {
+    group.argPlaceholder(placeholder);
+    return this;
+  }
+
+  public ArgumentParser description(String desc) {
+    group.description(desc);
     return this;
   }
 
@@ -46,6 +57,10 @@ public class ArgumentParser {
     parse(target, stack);
   }
 
-  public void printUsage(OutputStream out) {} // TODO
+  public void printUsage(String appname) {
+    System.out.print(appname + " ");
+    System.out.println(String.join(" ", group.exampleUsage()));
+    System.out.println(group.descriptionLine(-1, 0));
+  }
 
 }

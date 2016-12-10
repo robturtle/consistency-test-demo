@@ -4,17 +4,14 @@ import argparse.ArgumentParseException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This option group is valid only if all required options are settled
  */
-public class AndOptionGroup extends AbstractOption {
-
-  private final List<Option> opts = new ArrayList<>();
+public class AndOptionGroup extends AbstractOptionGroup {
 
   private final Map<Option, Boolean> required = new HashMap<>();
-
-  private Option last;
 
   public AndOptionGroup(String name) {
     super(name);
@@ -48,14 +45,14 @@ public class AndOptionGroup extends AbstractOption {
     return true;
   }
 
+  @Override
   public AndOptionGroup addOption(Option option) {
-    last = option;
-    opts.add(option);
+    super.addOption(option);
     optional(false);
     return this;
   }
 
-  public AndOptionGroup optional(boolean isOptional) {
+  public void optional(boolean isOptional) {
     if (last == null) {
       throw new AssertionError("There is no previous selected Option");
     }
@@ -65,8 +62,32 @@ public class AndOptionGroup extends AbstractOption {
     } else {
       required.remove(last);
     }
+  }
 
-    return this;
+  @Override
+  public Collection<String> exampleUsage() {
+    return opts
+      .stream()
+      .flatMap(opt -> {
+        if (required.containsKey(opt)) {
+          return opt.exampleUsage().stream();
+        } else {
+          Collection<String> parts = new ArrayList<>();
+          parts.add("[");
+          parts.addAll(opt.exampleUsage());
+          parts.add("]");
+          return parts.stream();
+        }
+      })
+      .collect(Collectors.toList());
+  }
+
+  public Collection<Option> getOptions() {
+    return opts;
+  }
+
+  public boolean isRequired(Option option) {
+    return required.get(option);
   }
 
 }
