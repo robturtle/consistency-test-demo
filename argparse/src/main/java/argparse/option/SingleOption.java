@@ -65,7 +65,9 @@ public class SingleOption extends AbstractOption {
     return (new StringBuilder()
       .append(indentation)
       .append(name).append(' ')
-      .append(descriptionStr)).toString();
+      .append(descriptionStr)
+      .append('\n')
+    ).toString();
   }
 
   public String argPlaceholder() {

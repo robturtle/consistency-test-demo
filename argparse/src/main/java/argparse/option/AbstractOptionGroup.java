@@ -54,7 +54,7 @@ public abstract class AbstractOptionGroup extends AbstractOption {
     StringBuilder builder = new StringBuilder();
     if (depth >= 0) { builder.append(getName()).append('\n'); } // no display group name for root group
     for (Option opt : opts) {
-      builder.append(opt.descriptionLine(depth + 1, thisNameWidth)).append('\n');
+      builder.append(opt.descriptionLine(depth + 1, thisNameWidth));
     }
     return builder.toString();
   }
