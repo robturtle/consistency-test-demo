@@ -2,10 +2,8 @@ package dsf16;
 
 import argparse.ArgumentParseException;
 import argparse.ArgumentParser;
-import argparse.argument.ArgumentConsumer;
 import argparse.argument.FieldSetter;
 import argparse.option.SingleOption;
-import argparse.type.TypeBuilder;
 import argparse.type.TypeBuilderRegistry;
 import ch.qos.logback.classic.Level;
 import kvstore.KVStore;
@@ -46,7 +44,7 @@ public class KVStoreConsistencyTester {
     parser.addOption(new SingleOption("-server", serverSetter));
     parser.addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds"))).optional(true);
     parser.addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds"))).optional(true);
-    parser.addOption(new SingleOption("-n", new FieldSetter("totalRequestNumber"))).optional(true);
+    parser.addOption(new SingleOption("-n", new FieldSetter("remainingRequestNumber"))).optional(true);
     parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber"))).optional(true);
     parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true))).optional(true);
   }
@@ -68,7 +66,7 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private CountDownLatch totalRequestNumber = new CountDownLatch(100000);
+  private CountDownLatch remainingRequestNumber = new CountDownLatch(100000);
 
   private int threadNumber = 80;
 
@@ -99,7 +97,7 @@ public class KVStoreConsistencyTester {
 
     sendTestingRequests();
     try {
-      totalRequestNumber.await();
+      remainingRequestNumber.await();
     } catch (InterruptedException ie) {
       Thread.currentThread().interrupt();
     }
@@ -112,14 +110,14 @@ public class KVStoreConsistencyTester {
     Collection<Future<?>> tasks = new LinkedList<>();
 
     logger.info("Sending requests...");
-    logger.info("Request number: {}", totalRequestNumber.getCount());
+    logger.info("Request number: {}", remainingRequestNumber.getCount());
     logger.info("Threads: {}, Sending Timeout: {} sec", threadNumber, sendingTimeSeconds);
 
     for (int i = 0; i < threadNumber; i++) {
       tasks.add(executorService.submit(() -> withClientOpened(client -> {
-        while (!Thread.currentThread().isInterrupted() && totalRequestNumber.getCount() != 0) {
+        while (!Thread.currentThread().isInterrupted() && remainingRequestNumber.getCount() != 0) {
           sendRequest(client);
-          totalRequestNumber.countDown();
+          remainingRequestNumber.countDown();
         }
       })));
     }
@@ -130,6 +128,7 @@ public class KVStoreConsistencyTester {
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
       } finally {
+        while (remainingRequestNumber.getCount() > 0) remainingRequestNumber.countDown(); // TODO use condition var
         for (Future<?> task : tasks) {
           task.cancel(true);
         }
