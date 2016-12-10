@@ -5,6 +5,7 @@ import argparse.ArgumentParser;
 import argparse.argument.ArgumentConsumer;
 import argparse.argument.FieldSetter;
 import argparse.option.SingleOption;
+import argparse.type.TypeBuilder;
 import argparse.type.TypeBuilderRegistry;
 import ch.qos.logback.classic.Level;
 import kvstore.KVStore;
@@ -37,6 +38,7 @@ public class KVStoreConsistencyTester {
   private static final ArgumentParser parser = new ArgumentParser();
   static {
     TypeBuilderRegistry.register(URI.class, s -> URI.create("my://" + s));
+    TypeBuilderRegistry.register(CountDownLatch.class, s -> new CountDownLatch(Integer.parseInt(s)));
 
     FieldSetter serverSetter = new FieldSetter("server",
       o -> ((URI)o).getHost() != null && ((URI)o).getPort() != -1);
@@ -44,6 +46,7 @@ public class KVStoreConsistencyTester {
     parser.addOption(new SingleOption("-server", serverSetter));
     parser.addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds"))).optional(true);
     parser.addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds"))).optional(true);
+    parser.addOption(new SingleOption("-n", new FieldSetter("totalRequestNumber"))).optional(true);
     parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber"))).optional(true);
     parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true))).optional(true);
   }
@@ -57,11 +60,15 @@ public class KVStoreConsistencyTester {
 
   private static final AtomicLong writeValue = new AtomicLong();
 
+  private final ExecutorService requestSenderTimeoutStopper = Executors.newSingleThreadExecutor();
+
   private final String testKey = "test";
 
   private URI server;
 
   private boolean isDebug = false;
+
+  private CountDownLatch totalRequestNumber = new CountDownLatch(100000);
 
   private int threadNumber = 80;
 
@@ -78,7 +85,7 @@ public class KVStoreConsistencyTester {
       parser.parse(this, args);
     } catch (ArgumentParseException e) {
       System.err.println(e.getMessage());
-      System.out.println("USAGE: consistency_test -server HOST:PORT [-j THREAD_NUMBER] [-sendtime TIME] [-debug] [-conntimeout TIMEOUT]");
+      System.out.println("USAGE: consistency_test -server HOST:PORT [-n REQUEST_NUMBER] [-j THREAD_NUMBER] [-sendtime TIME] [-debug] [-conntimeout TIMEOUT]");
       System.out.println("  -sendtime: In seconds, how much time to send requests");
       System.out.println("  -conntimeout: In seconds, set socket connection timeout");
       System.exit(-1);
@@ -89,35 +96,47 @@ public class KVStoreConsistencyTester {
     }
 
     initializeKVStore();
+
     sendTestingRequests();
+    try {
+      totalRequestNumber.await();
+    } catch (InterruptedException ie) {
+      Thread.currentThread().interrupt();
+    }
     System.err.println(sequence.get());
-    //System.exit(0); // XXX seems Thrift RPC didn't respect Thread#interrupt() (dead lock after the line above)
+    requestSenderTimeoutStopper.shutdownNow();
   }
 
   private void sendTestingRequests() {
     ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
     Collection<Future<?>> tasks = new LinkedList<>();
 
+    logger.info("Sending requests...");
+    logger.info("Request number: {}", totalRequestNumber.getCount());
+    logger.info("Threads: {}, Sending Timeout: {} sec", threadNumber, sendingTimeSeconds);
+
     for (int i = 0; i < threadNumber; i++) {
       tasks.add(executorService.submit(() -> withClientOpened(client -> {
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted() && totalRequestNumber.getCount() != 0) {
           sendRequest(client);
+          totalRequestNumber.countDown();
         }
       })));
     }
 
-    logger.info("Sending requests...");
-    logger.info("Threads: {}, Sending Time: {} sec", threadNumber, sendingTimeSeconds);
-    try {
-      Thread.sleep(sendingTimeSeconds * 1000);
-    } catch (InterruptedException ie) {
-      executorService.shutdown();
-      Thread.currentThread().interrupt();
-    } finally {
-      for (Future<?> task : tasks) { task.cancel(true); }
-      executorService.shutdown();
-      logger.info("Stop sending requests...");
-    }
+    requestSenderTimeoutStopper.submit(() -> {
+      try {
+        Thread.sleep(sendingTimeSeconds * 1000);
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+      } finally {
+        for (Future<?> task : tasks) {
+          task.cancel(true);
+        }
+        executorService.shutdown();
+        logger.info("Stop sending requests...");
+      }
+    });
   }
 
   private void initializeKVStore() {
