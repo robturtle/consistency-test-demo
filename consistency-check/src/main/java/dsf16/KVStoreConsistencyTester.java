@@ -45,9 +45,7 @@ public class KVStoreConsistencyTester {
     parser.addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds"))).optional(true);
     parser.addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds"))).optional(true);
     parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber"))).optional(true);
-
-    ArgumentConsumer debugModeSetter = (o, args) -> new FieldSetter("isDebug").set(o, true);
-    parser.addOption(new SingleOption("-debug", debugModeSetter)).optional(true);
+    parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true))).optional(true);
   }
 
   @FunctionalInterface
@@ -65,7 +63,7 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private int threadNumber = 20;
+  private int threadNumber = 80;
 
   private int connectionTimeoutSeconds = 10;
 
@@ -92,6 +90,8 @@ public class KVStoreConsistencyTester {
 
     initializeKVStore();
     sendTestingRequests();
+    System.err.println(sequence.get());
+    //System.exit(0); // XXX seems Thrift RPC didn't respect Thread#interrupt() (dead lock after the line above)
   }
 
   private void sendTestingRequests() {
@@ -111,7 +111,7 @@ public class KVStoreConsistencyTester {
     try {
       Thread.sleep(sendingTimeSeconds * 1000);
     } catch (InterruptedException ie) {
-      executorService.shutdownNow();
+      executorService.shutdown();
       Thread.currentThread().interrupt();
     } finally {
       for (Future<?> task : tasks) { task.cancel(true); }
