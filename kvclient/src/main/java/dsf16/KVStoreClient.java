@@ -49,12 +49,23 @@ public class KVStoreClient {
     FieldSetter serverSetter = new FieldSetter("server",
       o -> ((URI)o).getHost() != null && ((URI)o).getPort() != -1);
 
-    parser.addOption(new SingleOption("-server", serverSetter));
+    parser.addOption(new SingleOption("-server", serverSetter))
+      .argPlaceholder("PORT:HOST")
+      .description("Specify the location of the server");
+
     parser.addOption(
       new ExclusiveOptionGroup("operation")
-      .addOption(new SingleOption("-set", new FieldSetter("key"), new FieldSetter("value"), opSetter.apply("-set")))
-      .addOption(new SingleOption("-get", new FieldSetter("key"), opSetter.apply("-get")))
-      .addOption(new SingleOption("-del", new FieldSetter("key"), opSetter.apply("-del")))
+        .addOption(new SingleOption("-set", new FieldSetter("key"), new FieldSetter("value"), opSetter.apply("-set")))
+        .argPlaceholder("KEY VALUE")
+        .description("Set a new KEY-VALUE pair onto the store")
+
+        .addOption(new SingleOption("-get", new FieldSetter("key"), opSetter.apply("-get")))
+        .argPlaceholder("KEY")
+        .description("Get the value of the KEY from the store")
+
+        .addOption(new SingleOption("-del", new FieldSetter("key"), opSetter.apply("-del")))
+        .argPlaceholder("KEY")
+        .description("Delete the KEY-value pair from the store")
     );
 
     operations.put("-get", o -> client -> client.kvget(o.key));
@@ -78,8 +89,8 @@ public class KVStoreClient {
     try {
       parser.parse(this, args);
     } catch (ArgumentParseException e) {
-      System.err.println("ERROR: " + e.getMessage());
-      printUsage();
+      System.err.println("ERROR: " + e.getMessage() + "\n");
+      parser.printUsage("USAGE: kvclient");
       System.exit(-1);
     }
 
@@ -96,7 +107,7 @@ public class KVStoreClient {
 
       transport.close();
     } catch (TException x) {
-      System.err.println("ERROR during transmission: " + x.getMessage());
+      System.err.println("ERROR: " + x.getMessage());
       x.printStackTrace();
       System.exit(kError.ordinal());
     }
@@ -113,16 +124,6 @@ public class KVStoreClient {
       System.exit(result.error.ordinal());
     }
 
-  }
-
-  // TODO make parser auto generate this
-  private void printUsage() {
-    System.out.println("kvclient -server HOST:PORT { -set KEY VALUE | -get KEY | -del KEY }\n");
-    System.out.println("-server HOST:PORT : specify the location of the server\n");
-    System.out.println("operation");
-    System.out.println("  -set KEY VALUE    : set a new KEY-VALUE pair upto the server");
-    System.out.println("  -get KEY          : get the value related to that KEY");
-    System.out.println("  -del KEY          : delete the KEY-value pair");
   }
 
 }
