@@ -98,7 +98,8 @@ public class Graph<T> {
       }
     }
     for (graph.Vertex<T> neighbour : vertex.neighbours()) {
-      if (visitStatusMap.get(neighbour) != VisitStatus.Done) {
+      // since we want to iterate all paths, we don't stop when VisitStatus is Done
+      //if (visitStatusMap.get(neighbour) != VisitStatus.Done) {
         if (visitStatusMap.get(neighbour) == VisitStatus.Visited) {
           throw new CycleDetectedException();
         } else {
@@ -107,7 +108,7 @@ public class Graph<T> {
             return result;
           }
         }
-      }
+      //}
     }
     visitStatusMap.put(vertex, VisitStatus.Done);
     if (afterDone != null) { afterDone.visit(visitStatusMap, vertex); }
