@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import static kvstore.ErrorCode.kSuccess;
 
@@ -69,6 +70,10 @@ public class KVStoreConsistencyTester {
       .optional(true)
       .argPlaceholder("THREAD_NUM").description("Set the number of threads");
 
+    parser.addOption(new SingleOption("-timeout", new FieldSetter("programTimeoutSeconds")))
+      .optional(true)
+      .argPlaceholder("SECS").description("Set the running time of the whole program");
+
     parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true)))
       .optional(true)
       .description("Show debug logs");
@@ -85,6 +90,8 @@ public class KVStoreConsistencyTester {
 
   private final ExecutorService requestSenderTimeoutStopper = Executors.newSingleThreadExecutor();
 
+  private final ExecutorService programRunningTimeoutStopper = Executors.newSingleThreadExecutor();
+
   private final String testKey = "yangliu";
 
   private URI server;
@@ -98,6 +105,8 @@ public class KVStoreConsistencyTester {
   private int connectionTimeoutSeconds = 10;
 
   private int sendingTimeSeconds = 10;
+
+  private int programTimeoutSeconds = 55;
 
   private final ConsistencyAnalyst analyst = new ConsistencyAnalyst();
   private final ReentrantLock addingEntry = new ReentrantLock();
@@ -119,6 +128,18 @@ public class KVStoreConsistencyTester {
       ((ch.qos.logback.classic.Logger) logger).setLevel(Level.INFO);
     }
 
+    programRunningTimeoutStopper.submit(() -> {
+      try {
+        logger.info("Set program timeout = {} sec", programTimeoutSeconds);
+        Thread.sleep(programTimeoutSeconds * 1000);
+        logger.info("program timed out");
+        logger.info("No inconsistency caught...");
+        System.exit(0);
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+      }
+    });
+
     initializeKVStore();
 
     sendTestingRequests();
@@ -128,7 +149,9 @@ public class KVStoreConsistencyTester {
       Thread.currentThread().interrupt();
     }
     requestSenderTimeoutStopper.shutdownNow();
+
     logger.info("Start analysing...");
+    Future<?> fastChecker = Executors.newSingleThreadExecutor().submit(this::fastCheck);
     try {
       analyst.analysis();
       logger.info("No inconsistency detected...");
@@ -137,7 +160,26 @@ public class KVStoreConsistencyTester {
     } catch (CycleDetectedException e) {
       logger.info("Inconsistency detected!");
       System.exit(1);
+    } finally {
+      fastChecker.cancel(true);
     }
+  }
+
+  private void fastCheck() {
+    final String key = "fastYang";
+    withClientOpened(client -> {
+      long v = 0;
+      while (!Thread.currentThread().isInterrupted()) {
+        Result result = client.kvset(key, String.valueOf(v++));
+        if (result.error == kSuccess) {
+          result = client.kvget(key);
+          if (!result.value.equals(String.valueOf(v - 1))) {
+            logger.info("Inconsistency caught by fast checker");
+            System.exit(1);
+          }
+        }
+      }
+    });
   }
 
   private void sendTestingRequests() {
