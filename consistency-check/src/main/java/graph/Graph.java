@@ -8,6 +8,7 @@ public class Graph<T> {
   @SuppressWarnings("WeakerAccess")
   public static class Vertex<T> implements graph.Vertex<T> {
     private final Set<graph.Vertex<T>> adjacencies = new HashSet<>();
+    private final Set<graph.Vertex<T>> hybridAdjacencies = new HashSet<>();
     private T value;
 
     Vertex(T value) {
@@ -27,6 +28,14 @@ public class Graph<T> {
     @Override
     public void add_edge_to(graph.Vertex<T> other) {
       adjacencies.add(other);
+    }
+
+    public void add_hybrid_edge_to(graph.Vertex<T> other) {
+      hybridAdjacencies.add(other);
+    }
+
+    public void combine() {
+      adjacencies.addAll(hybridAdjacencies);
     }
 
     @Override
@@ -64,17 +73,22 @@ public class Graph<T> {
     return vertices;
   }
 
-  public <R> R DepthFirstTraversal(VertexVisitor<T, R> visitor) {
+  public <R> R DepthFirstTraversal(VertexVisitor<T, R> visitor, VertexVisitor<T, R> afterDone) {
     Map<graph.Vertex<T>, VisitStatus> visitStatusMap = new HashMap<>();
     for (Vertex<T> vertex : vertices) if (!visitStatusMap.containsKey(vertex)) {
-      R result = DFSIterating(visitStatusMap, visitor, vertex);
+      R result = DFSIterating(visitStatusMap, visitor, afterDone, vertex);
       if (result != null) { return result; }
     }
     return null;
   }
 
+  public <R> R DepthFirstTraversal(VertexVisitor<T, R> visitor) {
+    return DepthFirstTraversal(visitor, null);
+  }
+
   private <R> R DFSIterating(Map<graph.Vertex<T>, VisitStatus> visitStatusMap,
                              VertexVisitor<T, R> visitor,
+                             VertexVisitor<T, R> afterDone,
                              graph.Vertex<T> vertex) {
     visitStatusMap.put(vertex, VisitStatus.Visited);
     R result = visitor.visit(visitStatusMap, vertex);
@@ -86,7 +100,7 @@ public class Graph<T> {
         if (visitStatusMap.get(neighbour) == VisitStatus.Visited) {
           throw new CycleDetectedException();
         } else {
-          result = DFSIterating(visitStatusMap, visitor, neighbour);
+          result = DFSIterating(visitStatusMap, visitor, afterDone, neighbour);
           if (result != null) {
             return result;
           }
@@ -94,6 +108,7 @@ public class Graph<T> {
       }
     }
     visitStatusMap.put(vertex, VisitStatus.Done);
+    if (afterDone != null) { afterDone.visit(visitStatusMap, vertex); }
     return null;
   }
 }
