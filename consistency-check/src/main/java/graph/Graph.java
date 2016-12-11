@@ -59,7 +59,7 @@ public class Graph<T> {
     R visit(Map<graph.Vertex<T>, VisitStatus> visitStatusMap, graph.Vertex<T> vertex);
   }
 
-  private enum VisitStatus { Visited, Done }
+  public enum VisitStatus { Visited, Done }
 
   private final List<Vertex<T>> vertices = new ArrayList<>();
 
