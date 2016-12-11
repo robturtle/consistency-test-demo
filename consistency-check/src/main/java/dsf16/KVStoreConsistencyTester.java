@@ -41,12 +41,35 @@ public class KVStoreConsistencyTester {
     FieldSetter serverSetter = new FieldSetter("server",
       o -> ((URI)o).getHost() != null && ((URI)o).getPort() != -1);
 
-    parser.addOption(new SingleOption("-server", serverSetter));
-    parser.addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds"))).optional(true);
-    parser.addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds"))).optional(true);
-    parser.addOption(new SingleOption("-n", new FieldSetter("remainingRequestNumber"))).optional(true);
-    parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber"))).optional(true);
-    parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true))).optional(true);
+    parser
+      .addOption(new SingleOption("-server", serverSetter))
+      .argPlaceholder("HOST:PORT")
+      .description("Specify the location of the server");
+
+    parser
+      .addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds")))
+      .optional(true)
+      .argPlaceholder("SECS")
+      .description("Specify socket connection timeout in seconds");
+
+    parser
+      .addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds")))
+      .optional(true)
+      .argPlaceholder("SECS").description("Set max time duration of request sending period in seconds");
+
+    // TODO 用 AtomicLong 来保存 requestNumber, 条件变量等待它变成 0
+    parser
+      .addOption(new SingleOption("-n", new FieldSetter("remainingRequestNumber")))
+      .optional(true)
+      .argPlaceholder("NUM").description("Set max count of sending requests");
+
+    parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber")))
+      .optional(true)
+      .argPlaceholder("THREAD_NUM").description("Set the number of threads");
+
+    parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true)))
+      .optional(true)
+      .description("Show debug logs");
   }
 
   @FunctionalInterface
@@ -60,7 +83,7 @@ public class KVStoreConsistencyTester {
 
   private final ExecutorService requestSenderTimeoutStopper = Executors.newSingleThreadExecutor();
 
-  private final String testKey = "test";
+  private final String testKey = "yangliu";
 
   private URI server;
 
@@ -82,10 +105,8 @@ public class KVStoreConsistencyTester {
     try {
       parser.parse(this, args);
     } catch (ArgumentParseException e) {
-      System.err.println(e.getMessage());
-      System.out.println("USAGE: consistency_test -server HOST:PORT [-n REQUEST_NUMBER] [-j THREAD_NUMBER] [-sendtime TIME] [-debug] [-conntimeout TIMEOUT]");
-      System.out.println("  -sendtime: In seconds, how much time to send requests");
-      System.out.println("  -conntimeout: In seconds, set socket connection timeout");
+      System.err.println("ERROR: " + e.getMessage() + "\n");
+      parser.printUsage("USAGE: consistency-tester");
       System.exit(-1);
     }
 
