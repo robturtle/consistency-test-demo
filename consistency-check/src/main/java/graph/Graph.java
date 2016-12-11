@@ -91,16 +91,18 @@ public class Graph<T> {
                              VertexVisitor<T, R> afterDone,
                              graph.Vertex<T> vertex) {
     visitStatusMap.put(vertex, VisitStatus.Visited);
-    R result = visitor.visit(visitStatusMap, vertex);
-    if (result != null) {
-      return result;
+    if (visitor != null) {
+      R result = visitor.visit(visitStatusMap, vertex);
+      if (result != null) {
+        return result;
+      }
     }
     for (graph.Vertex<T> neighbour : vertex.neighbours()) {
       if (visitStatusMap.get(neighbour) != VisitStatus.Done) {
         if (visitStatusMap.get(neighbour) == VisitStatus.Visited) {
           throw new CycleDetectedException();
         } else {
-          result = DFSIterating(visitStatusMap, visitor, afterDone, neighbour);
+          R result = DFSIterating(visitStatusMap, visitor, afterDone, neighbour);
           if (result != null) {
             return result;
           }
