@@ -6,6 +6,7 @@ import argparse.argument.FieldSetter;
 import argparse.option.SingleOption;
 import argparse.type.TypeBuilderRegistry;
 import ch.qos.logback.classic.Level;
+import graph.CycleDetectedException;
 import kvstore.KVStore;
 import kvstore.Result;
 import org.apache.thrift.TException;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static kvstore.ErrorCode.kSuccess;
 
@@ -89,13 +91,16 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private CountDownLatch remainingRequestNumber = new CountDownLatch(100000);
+  private CountDownLatch remainingRequestNumber = new CountDownLatch(2000);
 
-  private int threadNumber = 80;
+  private int threadNumber = 20;
 
   private int connectionTimeoutSeconds = 10;
 
   private int sendingTimeSeconds = 10;
+
+  private final ConsistencyAnalyst analyst = new ConsistencyAnalyst();
+  private final ReentrantLock addingEntry = new ReentrantLock();
 
   public static void main(String[] args) {
     new KVStoreConsistencyTester().doMain(args);
@@ -122,8 +127,17 @@ public class KVStoreConsistencyTester {
     } catch (InterruptedException ie) {
       Thread.currentThread().interrupt();
     }
-    System.err.println(sequence.get());
     requestSenderTimeoutStopper.shutdownNow();
+    logger.info("Start analysing...");
+    try {
+      analyst.analysis();
+      logger.info("No inconsistency detected...");
+      logger.info("To try harder please check -j and -n options");
+      System.exit(0);
+    } catch (CycleDetectedException e) {
+      logger.info("Inconsistency detected!");
+      System.exit(1);
+    }
   }
 
   private void sendTestingRequests() {
@@ -137,8 +151,8 @@ public class KVStoreConsistencyTester {
     for (int i = 0; i < threadNumber; i++) {
       tasks.add(executorService.submit(() -> withClientOpened(client -> {
         while (!Thread.currentThread().isInterrupted() && remainingRequestNumber.getCount() != 0) {
-          sendRequest(client);
           remainingRequestNumber.countDown();
+          sendRequest(client);
         }
       })));
     }
@@ -172,6 +186,7 @@ public class KVStoreConsistencyTester {
         } while (!initValue.equals(result.value) && !Thread.currentThread().isInterrupted());
       });
       logger.info("initialization completed");
+      analyst.precedingGraph.newVertex(new RPCEntry(0, 0, initValue, false));
     });
 
     try {
@@ -187,20 +202,24 @@ public class KVStoreConsistencyTester {
 
   private void sendRequest(KVStore.Client client) throws TException {
     String value = "";
-    boolean isSet = ThreadLocalRandom.current().nextBoolean();
+    boolean isRead = ThreadLocalRandom.current().nextBoolean();
     long before = sequence.incrementAndGet();
     Result result;
-    if (isSet) {
+    if (isRead) {
+      result = client.kvget(testKey);
+    } else {
       value = String.valueOf(writeValue.incrementAndGet());
       result = client.kvset(testKey, value);
-    } else {
-      result = client.kvget(testKey);
     }
     long after = sequence.incrementAndGet();
     if (result.error == kSuccess) {
-      logger.debug("send: {}, receive: {}, method: {}",
-        before, after,
-        isSet ? "set, value: " + value : "get, value: " + result.value);
+      value = isRead ? result.value : value;
+      logger.debug("send: {}, receive: {}, method: {}, value: {}",
+        before, after, isRead ? "get" : "set", value);
+      RPCEntry entry = new RPCEntry(before, after, value, isRead);
+      addingEntry.lock();
+      analyst.precedingGraph.newVertex(entry);
+      addingEntry.unlock();
     } else {
       logger.warn("bad Result received");
     }
