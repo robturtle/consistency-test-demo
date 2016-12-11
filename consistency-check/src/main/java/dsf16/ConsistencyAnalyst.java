@@ -20,7 +20,7 @@ class ConsistencyAnalyst {
     precedingGraph.newVertex(entry);
   }
 
-  private void analysis() {
+  public void analysis() {
     Map<String, Vertex<RPCEntry>> dictatorMap = new HashMap<>();
 
     ArrayList<Vertex<RPCEntry>> startTimeIncreasingEntries =
@@ -70,7 +70,7 @@ class ConsistencyAnalyst {
         if (!v.getValue().isRead) { writers.push(v); }
         else {
           Vertex<RPCEntry> dictator = dictatorMap.get(v.getValue().value);
-          for (Vertex<RPCEntry> writer : writers) {
+          for (Vertex<RPCEntry> writer : writers) if (writer != dictator) {
             logger.debug("hybrid edge {} -> {}",
               writer.getValue().toString(),
               dictator.getValue().toString());
