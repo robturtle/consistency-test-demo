@@ -1,5 +1,7 @@
 package dsf16;
 
+import ch.qos.logback.classic.Level;
+import graph.CycleDetectedException;
 import graph.Graph;
 import graph.Vertex;
 import org.slf4j.Logger;
@@ -14,13 +16,14 @@ import java.util.*;
 class ConsistencyAnalyst {
   private static final Logger logger = LoggerFactory.getLogger(ConsistencyAnalyst.class);
 
-  private final Graph<RPCEntry> precedingGraph = new Graph<>();
+  public final Graph<RPCEntry> precedingGraph = new Graph<>();
 
   public void addEntry(RPCEntry entry) {
     precedingGraph.newVertex(entry);
   }
 
   public void analysis() {
+    ((ch.qos.logback.classic.Logger) logger).setLevel(Level.INFO);
     Map<String, Vertex<RPCEntry>> dictatorMap = new HashMap<>();
 
     ArrayList<Vertex<RPCEntry>> startTimeIncreasingEntries =
@@ -56,6 +59,10 @@ class ConsistencyAnalyst {
       RPCEntry readEntry = readerVertex.getValue();
       if (readEntry.isRead) {
         Vertex<RPCEntry> writerVertex = dictatorMap.get(readEntry.value);
+        if (writerVertex == null) {
+          logger.error("Read value with no dictator!");
+          throw new CycleDetectedException();
+        }
         logger.debug("data edge   {} -> {}",
           writerVertex.getValue().toString(),
           readEntry.toString());
@@ -64,31 +71,32 @@ class ConsistencyAnalyst {
     }
 
     // Adding hybrid edges
-    Deque<Vertex<RPCEntry>> writers = new ArrayDeque<>();
-    precedingGraph.DepthFirstTraversal(
-      (statusMap, v) -> {
-        if (!v.getValue().isRead) { writers.push(v); }
-        else {
-          Vertex<RPCEntry> dictator = dictatorMap.get(v.getValue().value);
-          for (Vertex<RPCEntry> writer : writers) if (writer != dictator) {
-            logger.debug("hybrid edge {} -> {}",
-              writer.getValue().toString(),
-              dictator.getValue().toString());
-            ((Graph.Vertex<RPCEntry>)writer).add_hybrid_edge_to(dictator);
-          }
+    for (Vertex<RPCEntry> writer : startTimeIncreasingEntries) {
+      if (writer.getValue().isRead) { continue; }
+      for (Vertex<RPCEntry> reader : startTimeIncreasingEntries) if (reader.getValue().isRead) {
+        Boolean connected = precedingGraph.<Boolean>DepthFirstTraversal(
+          (Graph.Vertex<RPCEntry>) writer, (map, v) -> (v == reader) ? Boolean.TRUE : null);
+
+        if (connected != null) {
+          Vertex<RPCEntry> dictator = dictatorMap.get(reader.getValue().value);
+          if (dictator == writer) { continue; }
+          logger.debug("hybrid edge {} -> {}",
+            writer.getValue().toString(),
+            dictator.getValue().toString());
+          ((Graph.Vertex<RPCEntry>)writer).add_hybrid_edge_to(dictator);
         }
-        return null;
-      },
-      (statusMap, v) -> {
-        if (!v.getValue().isRead) { writers.pop(); }
-        return null;
-      });
+      }
+    }
 
     for (Vertex<RPCEntry> vertex : precedingGraph.getVertices()) {
       ((Graph.Vertex<RPCEntry>)vertex).combine();
     }
 
     // Find cycle
-    precedingGraph.DepthFirstTraversal(null);
+    logger.info("Finding cycle...");
+    precedingGraph.DepthFirstTraversal((map, v) -> {
+      logger.debug("checking {}...", v.getValue().toString());
+      return null;
+    });
   }
 }
