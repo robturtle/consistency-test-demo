@@ -1,5 +1,7 @@
 ## Prerequisites
-JDK 8
+
+- JDK 8
+- thrift-compiler
 
 ## Installation
 ```shell
