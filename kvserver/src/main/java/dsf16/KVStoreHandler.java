@@ -29,7 +29,7 @@ class KVStoreHandler implements KVStore.Iface {
 
   private final Map<String, String> map; // TODO wrap file store
 
-  private final ExecutorService delayed = Executors.newCachedThreadPool();
+  private final ScheduledExecutorService delayed = Executors.newScheduledThreadPool(20);
 
   KVStoreHandler(boolean isBuggy) {
     if (isBuggy) {
@@ -46,8 +46,9 @@ class KVStoreHandler implements KVStore.Iface {
     if (key == null) { return paramIsNull.make("key"); }
     if (value == null) { return paramIsNull.make("value"); }
 
-    if (ThreadLocalRandom.current().nextInt(100) == 0) {
-      delayed.submit(() -> map.put(key, value));
+    if (ThreadLocalRandom.current().nextInt(1) == 0) {
+      int delay = ThreadLocalRandom.current().nextInt(10);
+      delayed.schedule(() -> map.put(key, value), delay, TimeUnit.MILLISECONDS);
     }
     map.put(key, value);
     return new Result("", kSuccess, "");
