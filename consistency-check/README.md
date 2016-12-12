@@ -3,7 +3,7 @@
 - JDK 8
 - thrift-compiler
 
-## Installation
+## Build
 ```shell
 git clone https://github.com/robturtle/distributed-system-project.git
 cd distributed-system-project
