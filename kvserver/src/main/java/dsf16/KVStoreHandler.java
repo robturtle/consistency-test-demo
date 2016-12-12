@@ -48,7 +48,7 @@ class KVStoreHandler implements KVStore.Iface {
 
     if (key == null) { return paramIsNull.make("key"); }
     if (value == null) { return paramIsNull.make("value"); }
-    if (isBuggy && ThreadLocalRandom.current().nextInt(1000) == 0) {
+    if (isBuggy && ThreadLocalRandom.current().nextInt(10) == 0) {
         int delay = ThreadLocalRandom.current().nextInt(2);
         delayed.schedule(() -> map.put(key, value), delay, TimeUnit.MILLISECONDS);
     } else {
