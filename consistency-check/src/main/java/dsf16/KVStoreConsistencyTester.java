@@ -226,7 +226,7 @@ public class KVStoreConsistencyTester {
       try {
         Thread.sleep(sendingTimeoutSeconds * 1000);
         addingEntry.lock(); // intentionally no unlock
-        logger.info("Stop sending requests...");
+        logger.info("Sending phase timed out, stop sending requests...");
         for (Future<?> task : tasks) {
           task.cancel(true);
         }
@@ -235,7 +235,7 @@ public class KVStoreConsistencyTester {
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
       } finally {
-        logger.info("Sending phase timed out. Totally {} requests sent",
+        logger.info("Totally {} requests sent",
           totalRequestNumber - remainingRequestNumber.getCount());
         while (remainingRequestNumber.getCount() > 0) remainingRequestNumber.countDown(); // TODO use condition var
       }
