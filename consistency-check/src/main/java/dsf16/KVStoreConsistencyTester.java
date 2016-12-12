@@ -5,7 +5,6 @@ import argparse.ArgumentParser;
 import argparse.argument.FieldSetter;
 import argparse.option.SingleOption;
 import argparse.type.TypeBuilderRegistry;
-import ch.qos.logback.classic.Level;
 import graph.CycleDetectedException;
 import kvstore.KVStore;
 import kvstore.Result;
@@ -55,7 +54,7 @@ public class KVStoreConsistencyTester {
       .description("Set the socket connection timeout in seconds");
 
     parser
-      .addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds")))
+      .addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeoutSeconds")))
       .optional(true)
       .argPlaceholder("SECS").description("Set max time duration of request sending phase in seconds");
 
@@ -107,7 +106,7 @@ public class KVStoreConsistencyTester {
 
   private int connectionTimeoutSeconds = 10;
 
-  private int sendingTimeSeconds = 10;
+  private int sendingTimeoutSeconds = 10;
 
   private int programTimeoutSeconds = 50;
 
@@ -200,7 +199,7 @@ public class KVStoreConsistencyTester {
 
     logger.info("Sending requests...");
     logger.info("Request number: {}", remainingRequestNumber.getCount());
-    logger.info("Threads: {}, Sending Timeout: {} sec", threadNumber, sendingTimeSeconds);
+    logger.info("Threads: {}, Sending Timeout: {} sec", threadNumber, sendingTimeoutSeconds);
 
     for (int i = 0; i < threadNumber; i++) {
       tasks.add(executorService.submit(() -> withClientOpened(client -> {
@@ -213,7 +212,7 @@ public class KVStoreConsistencyTester {
 
     requestSenderTimeoutStopper.submit(() -> {
       try {
-        Thread.sleep(sendingTimeSeconds * 1000);
+        Thread.sleep(sendingTimeoutSeconds * 1000);
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
       } finally {
