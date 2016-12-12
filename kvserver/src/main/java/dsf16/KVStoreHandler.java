@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
 
 import static kvstore.ErrorCode.*;
 import static org.slf4j.event.Level.ERROR;
@@ -32,6 +29,8 @@ class KVStoreHandler implements KVStore.Iface {
 
   private final Map<String, String> map; // TODO wrap file store
 
+  private final ExecutorService delayed = Executors.newCachedThreadPool();
+
   KVStoreHandler(boolean isBuggy) {
     if (isBuggy) {
       map = new HashMap<>();
@@ -47,11 +46,10 @@ class KVStoreHandler implements KVStore.Iface {
     if (key == null) { return paramIsNull.make("key"); }
     if (value == null) { return paramIsNull.make("value"); }
 
-    if (ThreadLocalRandom.current().nextInt(1) == 0) {
-      Executors.newSingleThreadExecutor().submit(() -> map.put(key, value));
-    } else {
-      map.put(key, value);
+    if (ThreadLocalRandom.current().nextInt(100) == 0) {
+      delayed.submit(() -> map.put(key, value));
     }
+    map.put(key, value);
     return new Result("", kSuccess, "");
   }
 
