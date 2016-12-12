@@ -38,7 +38,7 @@ class ConsistencyAnalyst {
     endTimeDecreasingEntries.sort((a, b) -> Long.compare(b.getValue().end, a.getValue().end));
 
     logger.info("Adding time edges...");
-    int timeEdgeNumber = 0;
+    //int timeEdgeNumber = 0;
     for (Vertex<RPCEntry> last : startTimeIncreasingEntries) {
       RPCEntry lastEntry = last.getValue();
       if (!lastEntry.isRead) { dictatorMap.put(lastEntry.value, last); }
@@ -51,16 +51,16 @@ class ConsistencyAnalyst {
           /*logger.debug("time edge   {} -> {}",
             entry.toString(),
             lastEntry.toString());*/
-          ++timeEdgeNumber;
+          //++timeEdgeNumber;
           preceding.add_edge_to(last);
           leftBound = Math.max(leftBound, entry.start);
         } else break;
       }
     }
-    logger.info("{} time edges added", timeEdgeNumber);
+    //logger.info("{} time edges added", timeEdgeNumber);
 
     logger.info("Adding data edges...");
-    int dataEdgeNumber = 0;
+    //int dataEdgeNumber = 0;
     for (Vertex<RPCEntry> readerVertex : startTimeIncreasingEntries) {
       RPCEntry readEntry = readerVertex.getValue();
       if (readEntry.isRead) {
@@ -72,15 +72,15 @@ class ConsistencyAnalyst {
         /*logger.debug("data edge   {} -> {}",
           writerVertex.getValue().toString(),
           readEntry.toString());*/
-        ++dataEdgeNumber;
+        //++dataEdgeNumber;
         writerVertex.add_edge_to(readerVertex);
       }
     }
-    logger.info("{} data edges added", dataEdgeNumber);
+    //logger.info("{} data edges added", dataEdgeNumber);
 
     // Adding hybrid edges
     logger.info("Adding hybrid edges...");
-    AtomicInteger hybridEdgeNumber = new AtomicInteger();
+    //AtomicInteger hybridEdgeNumber = new AtomicInteger();
     Deque<Vertex<RPCEntry>> writerStack = new ArrayDeque<>();
     Set<Vertex<RPCEntry>> metWriters = new HashSet<>();
 
@@ -95,7 +95,7 @@ class ConsistencyAnalyst {
               /*logger.debug("hybrid edge {} -> {}",
                 w.getValue().toString(),
                 dictator.getValue());*/
-              hybridEdgeNumber.incrementAndGet();
+              //hybridEdgeNumber.incrementAndGet();
               ((Graph.Vertex<RPCEntry>)w).add_hybrid_edge_to(dictator);
             }
           } else {
@@ -117,7 +117,7 @@ class ConsistencyAnalyst {
           return null;
         });
     }
-    logger.info("{} hybrid edges added", hybridEdgeNumber.get());
+    //logger.info("{} hybrid edges added", hybridEdgeNumber.get());
 
     logger.info("Finding cycle...");
     for (Vertex<RPCEntry> vertex : precedingGraph.getVertices()) {
