@@ -23,7 +23,6 @@ import java.util.LinkedList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
 
 import static kvstore.ErrorCode.kSuccess;
 
@@ -208,12 +207,6 @@ public class KVStoreConsistencyTester {
         while (!Thread.currentThread().isInterrupted() && remainingRequestNumber.getCount() != 0) {
           remainingRequestNumber.countDown();
           sendRequest(client);
-          /*int millis = ThreadLocalRandom.current().nextInt(10);
-          try {
-            Thread.sleep(millis);
-          } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-          }*/
         }
       })));
     }
