@@ -158,7 +158,8 @@ public class KVStoreConsistencyTester {
 
     logger.info("Start analysing...");
     Future<?> fastChecker = null;
-    if (!useFastChecker) {
+    if (useFastChecker) {
+      logger.info("Starting fast checker...");
       fastChecker = Executors.newSingleThreadExecutor().submit(this::fastCheck);
     }
     try {
