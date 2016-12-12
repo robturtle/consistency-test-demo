@@ -1,5 +1,7 @@
 package graph;
 
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -111,6 +113,7 @@ public class Graph<T> {
     for (graph.Vertex<T> neighbour : vertex.neighbours()) {
       if (visitStatusMap.get(neighbour) != VisitStatus.Done) {
         if (visitStatusMap.get(neighbour) == VisitStatus.Visited) {
+          LoggerFactory.getLogger(Graph.class).debug("backward {} => {}", vertex.getValue(), neighbour.getValue()); // TODO
           throw new CycleDetectedException();
         } else {
           R result = DFSIterating(visitStatusMap, visitor, afterDone, neighbour);
