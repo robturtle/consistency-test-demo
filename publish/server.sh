@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-java -jar `dirname "$0"`/kvserver.jar "$@"
+java -Xms1G -Xmx1G -jar `dirname "$0"`/kvserver.jar "$@"
