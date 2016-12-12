@@ -52,12 +52,12 @@ public class KVStoreConsistencyTester {
       .addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds")))
       .optional(true)
       .argPlaceholder("SECS")
-      .description("Specify socket connection timeout in seconds");
+      .description("Set the socket connection timeout in seconds");
 
     parser
       .addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeSeconds")))
       .optional(true)
-      .argPlaceholder("SECS").description("Set max time duration of request sending period in seconds");
+      .argPlaceholder("SECS").description("Set max time duration of request sending phase in seconds");
 
     // TODO 用 AtomicLong 来保存 requestNumber, 条件变量等待它变成 0
     parser
@@ -71,15 +71,15 @@ public class KVStoreConsistencyTester {
 
     parser.addOption(new SingleOption("-timeout", new FieldSetter("programTimeoutSeconds")))
       .optional(true)
-      .argPlaceholder("SECS").description("Set the running time of the whole program");
+      .argPlaceholder("SECS").description("Set the running timeout of the whole program");
 
     parser.addOption(new SingleOption("-no-fastcheck", new FieldSetter("useFastChecker").set(false)))
       .optional(true)
       .description("Do not use fast checker (A single thread tester testing if it reads most recent writes)");
 
-    parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true)))
+    /*parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true)))
       .optional(true)
-      .description("Show debug logs");
+      .description("Show debug logs");*/
   }
 
   @FunctionalInterface
