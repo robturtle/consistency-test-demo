@@ -86,8 +86,12 @@ public class Graph<T> {
     return DepthFirstTraversal(visitor, null);
   }
 
+  public <R> R DepthFirstTraversal(Vertex<T> start, VertexVisitor<T, R> visitor, VertexVisitor<T, R> afterDone) {
+    return DFSIterating(new HashMap<>(), visitor, afterDone, start);
+  }
+
   public <R> R DepthFirstTraversal(Vertex<T> start, VertexVisitor<T, R> visitor) {
-    return DFSIterating(new HashMap<>(), visitor, null, start);
+    return DepthFirstTraversal(start, visitor, null);
   }
 
   private <R> R DFSIterating(Map<graph.Vertex<T>, VisitStatus> visitStatusMap,
