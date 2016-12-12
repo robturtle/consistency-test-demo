@@ -268,8 +268,8 @@ public class KVStoreConsistencyTester {
     long after = sequence.incrementAndGet();
     if (result.error == kSuccess) {
       value = isRead ? result.value : value;
-      logger.debug("send: {}, receive: {}, method: {}, value: {}",
-        before, after, isRead ? "get" : "set", value);
+      /*logger.debug("send: {}, receive: {}, method: {}, value: {}",
+        before, after, isRead ? "get" : "set", value);*/
       RPCEntry entry = new RPCEntry(before, after, value, isRead);
       addingEntry.lock();
       analyst.precedingGraph.newVertex(entry);
