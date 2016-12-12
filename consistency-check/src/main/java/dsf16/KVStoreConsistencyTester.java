@@ -177,6 +177,9 @@ public class KVStoreConsistencyTester {
     } catch (ExecutionException ee) {
       logger.warn("fast checker died abnormally. abort.");
       System.exit(2);
+    } catch (StackOverflowError se) {
+      logger.warn("DFS recursion level is too deep, please try again. abort.");
+      System.exit(2);
     } finally {
       if (fastChecker != null) {
         fastChecker.cancel(true);
