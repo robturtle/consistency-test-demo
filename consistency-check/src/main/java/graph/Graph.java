@@ -3,7 +3,6 @@ package graph;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class Graph<T> {
 
@@ -56,11 +55,26 @@ public class Graph<T> {
     }
   }
 
+  /**
+   * <p>An visitor function for a traversing method which will be invoked for each
+   * traversed vertex. The visit status map is passed along with the vertex so
+   * this visitor can check the whole traversing progress at the moment.</p>
+   *
+   * <p>NOTE: ONLY when you wish the traversing to be shortcut from some value, shall
+   * this function return a non-null value. If you want the traversing completed
+   * entirely, you should make the function return null.</p>
+   *
+   * @param <T> The value type of the vertex
+   * @param <R> The shortcut return value type; Void if wish to traverse all vertices
+   */
   @FunctionalInterface
   public interface VertexVisitor<T, R> {
     R visit(Map<graph.Vertex<T>, VisitStatus> visitStatusMap, graph.Vertex<T> vertex);
   }
 
+  /**
+   * The traversing status of a vertex; null represents unvisited
+   */
   public enum VisitStatus { Visited, Done }
 
   private final List<Vertex<T>> vertices = new ArrayList<>();
@@ -110,7 +124,7 @@ public class Graph<T> {
     for (graph.Vertex<T> neighbour : vertex.neighbours()) {
       if (visitStatusMap.get(neighbour) != VisitStatus.Done) {
         if (visitStatusMap.get(neighbour) == VisitStatus.Visited) {
-          LoggerFactory.getLogger(Graph.class).debug("backward {} => {}", vertex.getValue(), neighbour.getValue()); // TODO
+          LoggerFactory.getLogger(Graph.class).debug("backward {} => {}", vertex.getValue(), neighbour.getValue());
           throw new CycleDetectedException();
         } else {
           R result = DFSIterating(visitStatusMap, visitor, afterDone, neighbour);
