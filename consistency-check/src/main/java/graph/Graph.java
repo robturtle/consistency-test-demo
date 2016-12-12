@@ -36,7 +36,7 @@ public class Graph<T> {
       hybridAdjacencies.add(other);
     }
 
-    public void combine() {
+    public void combineNormalAndHybridEdges() {
       adjacencies.addAll(hybridAdjacencies);
     }
 

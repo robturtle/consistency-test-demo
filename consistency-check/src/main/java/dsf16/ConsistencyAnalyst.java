@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
 
 /**
  * Check consistency for RPCEntry graph. If some inconsistency is observed, CycleDetectedException
@@ -96,7 +94,7 @@ class ConsistencyAnalyst {
 
     logger.info("Finding cycle...");
     for (Vertex<RPCEntry> vertex : precedingGraph.getVertices()) {
-      ((Graph.Vertex<RPCEntry>)vertex).combine();
+      ((Graph.Vertex<RPCEntry>)vertex).combineNormalAndHybridEdges();
     }
 
     // Find cycle
