@@ -139,8 +139,7 @@ public class KVStoreConsistencyTester {
       try {
         logger.info("Set program timeout = {} sec", programTimeoutSeconds);
         Thread.sleep(programTimeoutSeconds * 1000);
-        logger.info("program timed out");
-        logger.info("No inconsistency caught...");
+        logger.info("Program timed out. No inconsistency caught");
         System.exit(0);
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
@@ -165,7 +164,7 @@ public class KVStoreConsistencyTester {
     }
     try {
       analyst.analyze();
-      logger.info("No inconsistency detected in graph algorithm...");
+      logger.info("No inconsistency detected in graph algorithm");
       logger.info("To try harder please check -j and -n options");
       if (fastChecker != null) {
         logger.info("Use the rest of time to do more fast check...");
