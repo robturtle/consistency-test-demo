@@ -43,17 +43,17 @@ class ConsistencyAnalyst {
       RPCEntry lastEntry = last.getValue();
       if (!lastEntry.isRead) { dictatorMap.put(lastEntry.value, last); }
 
-      long rightBound = Long.MIN_VALUE;
+      long leftBound = Long.MIN_VALUE;
       for (Vertex<RPCEntry> preceding : endTimeDecreasingEntries) {
         RPCEntry entry = preceding.getValue();
         if (!entry.happenBefore(lastEntry)) { continue; }
-        if (rightBound < entry.end) {
+        if (leftBound < entry.end) {
           /*logger.debug("time edge   {} -> {}",
             entry.toString(),
             lastEntry.toString());*/
           ++timeEdgeNumber;
           preceding.add_edge_to(last);
-          rightBound = Math.max(rightBound, entry.start);
+          leftBound = Math.max(leftBound, entry.start);
         } else break;
       }
     }
