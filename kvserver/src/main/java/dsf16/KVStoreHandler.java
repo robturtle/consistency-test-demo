@@ -31,7 +31,10 @@ class KVStoreHandler implements KVStore.Iface {
 
   private final ScheduledExecutorService delayed = Executors.newScheduledThreadPool(20);
 
+  private final boolean isBuggy;
+
   KVStoreHandler(boolean isBuggy) {
+    this.isBuggy = isBuggy;
     if (isBuggy) {
       map = new HashMap<>();
     } else {
@@ -45,12 +48,12 @@ class KVStoreHandler implements KVStore.Iface {
 
     if (key == null) { return paramIsNull.make("key"); }
     if (value == null) { return paramIsNull.make("value"); }
-
-    if (ThreadLocalRandom.current().nextInt(1) == 0) {
-      int delay = ThreadLocalRandom.current().nextInt(10);
-      delayed.schedule(() -> map.put(key, value), delay, TimeUnit.MILLISECONDS);
+    if (isBuggy && ThreadLocalRandom.current().nextInt(1000) == 0) {
+        int delay = ThreadLocalRandom.current().nextInt(2);
+        delayed.schedule(() -> map.put(key, value), delay, TimeUnit.MILLISECONDS);
+    } else {
+      map.put(key, value);
     }
-    map.put(key, value);
     return new Result("", kSuccess, "");
   }
 
