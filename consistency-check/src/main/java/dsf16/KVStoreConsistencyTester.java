@@ -213,15 +213,16 @@ public class KVStoreConsistencyTester {
     requestSenderTimeoutStopper.submit(() -> {
       try {
         Thread.sleep(sendingTimeoutSeconds * 1000);
+        logger.info("Stop sending requests...");
+        for (Future<?> task : tasks) {
+          task.cancel(true);
+        }
+        executorService.shutdownNow();
+        executorService.awaitTermination(1, TimeUnit.SECONDS);
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
       } finally {
         while (remainingRequestNumber.getCount() > 0) remainingRequestNumber.countDown(); // TODO use condition var
-        for (Future<?> task : tasks) {
-          task.cancel(true);
-        }
-        executorService.shutdown();
-        logger.info("Stop sending requests...");
       }
     });
   }
