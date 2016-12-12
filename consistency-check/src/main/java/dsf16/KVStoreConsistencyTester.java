@@ -37,7 +37,6 @@ public class KVStoreConsistencyTester {
   private static final ArgumentParser parser = new ArgumentParser();
   static {
     TypeBuilderRegistry.register(URI.class, s -> URI.create("my://" + s));
-    TypeBuilderRegistry.register(CountDownLatch.class, s -> new CountDownLatch(Integer.parseInt(s)));
 
     FieldSetter serverSetter = new FieldSetter("server",
       o -> ((URI)o).getHost() != null && ((URI)o).getPort() != -1);
@@ -58,7 +57,6 @@ public class KVStoreConsistencyTester {
       .optional(true)
       .argPlaceholder("SECS").description("Set max time duration of request sending phase in seconds");
 
-    // TODO 用 AtomicLong 来保存 requestNumber, 条件变量等待它变成 0
     parser
       .addOption(new SingleOption("-n", new FieldSetter("totalRequestNumber")))
       .optional(true)
@@ -103,7 +101,7 @@ public class KVStoreConsistencyTester {
   private int totalRequestNumber = 45000;
 
   // TODO it will not work, change it with AtomicLong
-  private CountDownLatch remainingRequestNumber = new CountDownLatch(totalRequestNumber);
+  private CountDownLatch remainingRequestNumber;
 
   private int threadNumber = 20;
 
@@ -130,6 +128,7 @@ public class KVStoreConsistencyTester {
       parser.printUsage("USAGE: consistency-tester");
       System.exit(-1);
     }
+    remainingRequestNumber = new CountDownLatch(totalRequestNumber);
 
     /*if (!isDebug) {
       ((ch.qos.logback.classic.Logger) logger).setLevel(Level.INFO);
