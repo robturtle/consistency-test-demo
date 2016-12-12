@@ -60,7 +60,7 @@ public class KVStoreConsistencyTester {
 
     // TODO 用 AtomicLong 来保存 requestNumber, 条件变量等待它变成 0
     parser
-      .addOption(new SingleOption("-n", new FieldSetter("remainingRequestNumber")))
+      .addOption(new SingleOption("-n", new FieldSetter("totalRequestNumber")))
       .optional(true)
       .argPlaceholder("NUM").description("Set max count of sending requests");
 
@@ -100,7 +100,10 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private CountDownLatch remainingRequestNumber = new CountDownLatch(45000);
+  private int totalRequestNumber = 45000;
+
+  // TODO it will not work, change it with AtomicLong
+  private CountDownLatch remainingRequestNumber = new CountDownLatch(totalRequestNumber);
 
   private int threadNumber = 20;
 
@@ -222,6 +225,8 @@ public class KVStoreConsistencyTester {
       } catch (InterruptedException ie) {
         Thread.currentThread().interrupt();
       } finally {
+        logger.info("Sending phase timed out. Totally {} requests sent",
+          totalRequestNumber - remainingRequestNumber.getCount());
         while (remainingRequestNumber.getCount() > 0) remainingRequestNumber.countDown(); // TODO use condition var
       }
     });
