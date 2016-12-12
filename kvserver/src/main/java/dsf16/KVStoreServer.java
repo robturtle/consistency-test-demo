@@ -35,7 +35,7 @@ public class KVStoreServer {
 
   private static void serve(Processor<KVStore.Iface> processor, int port) {
     try {
-      TServerTransport transport = new TServerSocket(port); // TODO specify from command line
+      TServerTransport transport = new TServerSocket(port);
       TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(transport).processor(processor));
 
       logger.info("Starting kvstore server at {} ...", port);

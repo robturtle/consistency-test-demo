@@ -100,7 +100,6 @@ public class KVStoreConsistencyTester {
 
   private int totalRequestNumber = 45000;
 
-  // TODO it will not work, change it with AtomicLong
   private CountDownLatch remainingRequestNumber;
 
   private int threadNumber = 20;
