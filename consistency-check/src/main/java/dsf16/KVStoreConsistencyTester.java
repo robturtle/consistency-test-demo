@@ -47,26 +47,26 @@ public class KVStoreConsistencyTester {
       .description("Specify the location of the server");
 
     parser
-      .addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds")))
+      .addOption(new SingleOption("-conntimeout", new FieldSetter("connectionTimeoutSeconds", o -> ((int)o) > 0)))
       .optional(true)
       .argPlaceholder("SECS")
       .description("Set the socket connection timeout in seconds");
 
     parser
-      .addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeoutSeconds")))
+      .addOption(new SingleOption("-sendtime", new FieldSetter("sendingTimeoutSeconds", o -> ((int)o) > 0)))
       .optional(true)
       .argPlaceholder("SECS").description("Set max time duration of request sending phase in seconds");
 
     parser
-      .addOption(new SingleOption("-n", new FieldSetter("totalRequestNumber")))
+      .addOption(new SingleOption("-n", new FieldSetter("totalRequestNumber", o -> ((int)o) >= 0)))
       .optional(true)
       .argPlaceholder("NUM").description("Set max count of sending requests");
 
-    parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber")))
+    parser.addOption(new SingleOption("-j", new FieldSetter("threadNumber", o -> ((int)o) > 0)))
       .optional(true)
       .argPlaceholder("THREAD_NUM").description("Set the number of threads");
 
-    parser.addOption(new SingleOption("-timeout", new FieldSetter("programTimeoutSeconds")))
+    parser.addOption(new SingleOption("-timeout", new FieldSetter("programTimeoutSeconds", o -> ((int)o) > 0)))
       .optional(true)
       .argPlaceholder("SECS").description("Set the running timeout of the whole program");
 
