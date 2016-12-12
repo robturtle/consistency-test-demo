@@ -29,9 +29,6 @@ public class Graph<T> {
 
     @Override
     public void add_edge_to(graph.Vertex<T> other) {
-      if (other == this) {
-        throw new AssertionError("Cannot add edge to self!");
-      }
       adjacencies.add(other);
     }
 
