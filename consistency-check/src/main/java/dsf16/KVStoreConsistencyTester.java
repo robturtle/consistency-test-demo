@@ -162,7 +162,7 @@ public class KVStoreConsistencyTester {
       fastChecker = Executors.newSingleThreadExecutor().submit(this::fastCheck);
     }
     try {
-      analyst.analysis();
+      analyst.analyze();
       logger.info("No inconsistency detected...");
       logger.info("To try harder please check -j and -n options");
       System.exit(0);

@@ -24,7 +24,7 @@ class ConsistencyAnalyst {
     precedingGraph.newVertex(entry);
   }
 
-  public void analysis() {
+  public void analyze() {
     ((ch.qos.logback.classic.Logger) logger).setLevel(Level.INFO);
     Map<String, Vertex<RPCEntry>> dictatorMap = new HashMap<>();
 
