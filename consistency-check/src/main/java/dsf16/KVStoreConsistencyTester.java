@@ -74,6 +74,10 @@ public class KVStoreConsistencyTester {
       .optional(true)
       .argPlaceholder("SECS").description("Set the running time of the whole program");
 
+    parser.addOption(new SingleOption("-no-fastcheck", new FieldSetter("useFastChecker").set(false)))
+      .optional(true)
+      .description("Do not use fast checker (A single thread tester testing if it reads most recent writes)");
+
     parser.addOption(new SingleOption("-debug", new FieldSetter("isDebug").set(true)))
       .optional(true)
       .description("Show debug logs");
@@ -98,7 +102,7 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private CountDownLatch remainingRequestNumber = new CountDownLatch(7500);
+  private CountDownLatch remainingRequestNumber = new CountDownLatch(5000);
 
   private int threadNumber = 20;
 
@@ -106,7 +110,9 @@ public class KVStoreConsistencyTester {
 
   private int sendingTimeSeconds = 10;
 
-  private int programTimeoutSeconds = 55;
+  private int programTimeoutSeconds = 50;
+
+  private boolean useFastChecker = true;
 
   private final ConsistencyAnalyst analyst = new ConsistencyAnalyst();
   private final ReentrantLock addingEntry = new ReentrantLock();
@@ -151,7 +157,10 @@ public class KVStoreConsistencyTester {
     requestSenderTimeoutStopper.shutdownNow();
 
     logger.info("Start analysing...");
-    Future<?> fastChecker = Executors.newSingleThreadExecutor().submit(this::fastCheck);
+    Future<?> fastChecker = null;
+    if (!useFastChecker) {
+      fastChecker = Executors.newSingleThreadExecutor().submit(this::fastCheck);
+    }
     try {
       analyst.analysis();
       logger.info("No inconsistency detected...");
@@ -161,13 +170,15 @@ public class KVStoreConsistencyTester {
       logger.info("Inconsistency detected!");
       System.exit(1);
     } finally {
-      fastChecker.cancel(true);
+      if (fastChecker != null) {
+        fastChecker.cancel(true);
+      }
     }
   }
 
   private void fastCheck() {
     final String key = "fastYang";
-    /*withClientOpened(client -> {
+    withClientOpened(client -> {
       long v = 0;
       while (!Thread.currentThread().isInterrupted()) {
         Result result = client.kvset(key, String.valueOf(v++));
@@ -176,11 +187,11 @@ public class KVStoreConsistencyTester {
           if (!result.value.equals(String.valueOf(v - 1))) {
             logger.info("Inconsistency caught by fast checker");
             logger.info("set: {}, get: {}", v - 1, result.value);
-            //System.exit(1);
+            System.exit(1);
           }
         }
       }
-    });*/
+    });
   }
 
   private void sendTestingRequests() {
