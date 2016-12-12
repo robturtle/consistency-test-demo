@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BooleanSupplier;
 
 /**
  * Check consistency for RPCEntry graph. If some inconsistency is observed, CycleDetectedException
@@ -35,7 +37,8 @@ class ConsistencyAnalyst {
     startTimeIncreasingEntries.sort((a, b) -> Long.compare(a.getValue().start, b.getValue().start));
     endTimeDecreasingEntries.sort((a, b) -> Long.compare(b.getValue().end, a.getValue().end));
 
-    // Adding time edges
+    logger.info("Adding time edges...");
+    int timeEdgeNumber = 0;
     for (Vertex<RPCEntry> last : startTimeIncreasingEntries) {
       RPCEntry lastEntry = last.getValue();
       if (!lastEntry.isRead) { dictatorMap.put(lastEntry.value, last); }
@@ -48,13 +51,16 @@ class ConsistencyAnalyst {
           logger.debug("time edge   {} -> {}",
             entry.toString(),
             lastEntry.toString());
+          ++timeEdgeNumber;
           preceding.add_edge_to(last);
           rightBound = Math.max(rightBound, entry.start);
         } else break;
       }
     }
+    logger.info("{} time edges added", timeEdgeNumber);
 
-    // Adding data edges
+    logger.info("Adding data edges...");
+    int dataEdgeNumber = 0;
     for (Vertex<RPCEntry> readerVertex : startTimeIncreasingEntries) {
       RPCEntry readEntry = readerVertex.getValue();
       if (readEntry.isRead) {
@@ -66,34 +72,53 @@ class ConsistencyAnalyst {
         logger.debug("data edge   {} -> {}",
           writerVertex.getValue().toString(),
           readEntry.toString());
+        ++dataEdgeNumber;
         writerVertex.add_edge_to(readerVertex);
       }
     }
+    logger.info("{} data edges added", dataEdgeNumber);
 
     // Adding hybrid edges
+    logger.info("Adding hybrid edges...");
+    AtomicInteger hybridEdgeNumber = new AtomicInteger();
+    Deque<Vertex<RPCEntry>> writerStack = new ArrayDeque<>();
+    Set<Vertex<RPCEntry>> metWriters = new HashSet<>();
+
     for (Vertex<RPCEntry> writer : startTimeIncreasingEntries) {
-      if (writer.getValue().isRead) { continue; }
-      for (Vertex<RPCEntry> reader : startTimeIncreasingEntries) if (reader.getValue().isRead) {
-        Boolean connected = precedingGraph.<Boolean>DepthFirstTraversal(
-          (Graph.Vertex<RPCEntry>) writer, (map, v) -> (v == reader) ? Boolean.TRUE : null);
-
-        if (connected != null) {
-          Vertex<RPCEntry> dictator = dictatorMap.get(reader.getValue().value);
-          if (dictator == writer) { continue; }
-          logger.debug("hybrid edge {} -> {}",
-            writer.getValue().toString(),
-            dictator.getValue().toString());
-          ((Graph.Vertex<RPCEntry>)writer).add_hybrid_edge_to(dictator);
-        }
-      }
+      if (writer.getValue().isRead /*|| metWriters.contains(writer)*/) { continue; }
+      precedingGraph.DepthFirstTraversal(
+        (Graph.Vertex<RPCEntry>) writer,
+        (map, v) -> {
+          if (v.getValue().isRead) {
+            Vertex<RPCEntry> dictator = dictatorMap.get(v.getValue().value);
+            //for (Vertex<RPCEntry> w : writerStack) {
+              logger.debug("hybrid edge {} -> {}",
+                //w.getValue().toString(),
+                writer.getValue().toString(),
+                dictator.getValue().toString());
+              hybridEdgeNumber.incrementAndGet();
+              //((Graph.Vertex<RPCEntry>)w).add_hybrid_edge_to(dictator);
+              ((Graph.Vertex<RPCEntry>)writer).add_hybrid_edge_to(dictator);
+            //}
+          } /*else {
+            //metWriters.add(v);
+            //writerStack.push(v);
+          }*/
+          return null;
+        }/*,
+        (map, v) -> {
+          if (!v.getValue().isRead) { writerStack.pop(); }
+          return null;
+        }*/);
     }
+    logger.info("{} hybrid edges added", hybridEdgeNumber.get());
 
+    logger.info("Finding cycle...");
     for (Vertex<RPCEntry> vertex : precedingGraph.getVertices()) {
       ((Graph.Vertex<RPCEntry>)vertex).combine();
     }
 
     // Find cycle
-    logger.info("Finding cycle...");
     precedingGraph.DepthFirstTraversal((map, v) -> {
       logger.debug("checking {}...", v.getValue().toString());
       return null;
