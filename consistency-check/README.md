@@ -53,6 +53,22 @@ Currently the DAG algorithm is implemented in time complexity of O(n^2). On a la
 
 After part 1 of DAG algorithm, the part 2 and the fast checker is fired concurrently if the fast checker is not disabled. And if fast checker is enabled, it will keep working inspite of the DAG algorithm is returned with no  inconsistency found. It will keep running until the given timeout is reached.
 
+## File structure
+
+```shell
+src/main/java
+├── dsf16
+│   ├── ConsistencyAnalyst.java       # The DAG algorithm
+│   ├── KVStoreConsistencyTester.java # The command line interface
+│   └── RPCEntry.java
+└── graph                             # Graph functions
+    ├── CycleDetectedException.java
+    ├── Graph.java
+    └── Vertex.java
+
+2 directories, 6 files
+```
+
 ### Configuration
 
 The concurrent request sending phase is bound with both time and number constrains. Either timeout or max rending request number is reached will stop the sending phase. Its value can be changed from command line with **-sendtime** and **-n** respectively.
