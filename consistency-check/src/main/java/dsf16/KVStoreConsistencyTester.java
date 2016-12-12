@@ -129,9 +129,9 @@ public class KVStoreConsistencyTester {
       System.exit(-1);
     }
 
-    if (!isDebug) {
+    /*if (!isDebug) {
       ((ch.qos.logback.classic.Logger) logger).setLevel(Level.INFO);
-    }
+    }*/
 
     programRunningTimeoutStopper.submit(() -> {
       try {
@@ -240,7 +240,7 @@ public class KVStoreConsistencyTester {
         } while (!initValue.equals(result.value) && !Thread.currentThread().isInterrupted());
       });
       logger.info("initialization completed");
-      analyst.precedingGraph.newVertex(new RPCEntry(0, 0, initValue, false));
+      analyst.addEntry(new RPCEntry(0, 0, initValue, false));
     });
 
     try {
@@ -272,7 +272,7 @@ public class KVStoreConsistencyTester {
         before, after, isRead ? "get" : "set", value);*/
       RPCEntry entry = new RPCEntry(before, after, value, isRead);
       addingEntry.lock();
-      analyst.precedingGraph.newVertex(entry);
+      analyst.addEntry(entry);
       addingEntry.unlock();
     } else {
       logger.warn("bad Result received");

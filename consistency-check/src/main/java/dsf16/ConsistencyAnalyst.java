@@ -18,13 +18,13 @@ import java.util.function.BooleanSupplier;
 class ConsistencyAnalyst {
   private static final Logger logger = LoggerFactory.getLogger(ConsistencyAnalyst.class);
 
-  public final Graph<RPCEntry> precedingGraph = new Graph<>();
+  private final Graph<RPCEntry> precedingGraph = new Graph<>();
 
-  public void addEntry(RPCEntry entry) {
+  void addEntry(RPCEntry entry) {
     precedingGraph.newVertex(entry);
   }
 
-  public void analyze() {
+  void analyze() {
     ((ch.qos.logback.classic.Logger) logger).setLevel(Level.INFO);
     Map<String, Vertex<RPCEntry>> dictatorMap = new HashMap<>();
 
