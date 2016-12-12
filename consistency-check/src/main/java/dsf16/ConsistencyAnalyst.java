@@ -91,6 +91,7 @@ class ConsistencyAnalyst {
         (map, v) -> {
           if (v.getValue().isRead) {
             Vertex<RPCEntry> dictator = dictatorMap.get(v.getValue().value);
+            if (dictator == writer) { return null; }
             //for (Vertex<RPCEntry> w : writerStack) {
               logger.debug("hybrid edge {} -> {}",
                 //w.getValue().toString(),
