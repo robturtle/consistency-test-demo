@@ -98,7 +98,7 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private CountDownLatch remainingRequestNumber = new CountDownLatch(2000);
+  private CountDownLatch remainingRequestNumber = new CountDownLatch(7500);
 
   private int threadNumber = 20;
 
@@ -167,7 +167,7 @@ public class KVStoreConsistencyTester {
 
   private void fastCheck() {
     final String key = "fastYang";
-    withClientOpened(client -> {
+    /*withClientOpened(client -> {
       long v = 0;
       while (!Thread.currentThread().isInterrupted()) {
         Result result = client.kvset(key, String.valueOf(v++));
@@ -175,11 +175,12 @@ public class KVStoreConsistencyTester {
           result = client.kvget(key);
           if (!result.value.equals(String.valueOf(v - 1))) {
             logger.info("Inconsistency caught by fast checker");
-            System.exit(1);
+            logger.info("set: {}, get: {}", v - 1, result.value);
+            //System.exit(1);
           }
         }
       }
-    });
+    });*/
   }
 
   private void sendTestingRequests() {
@@ -195,6 +196,12 @@ public class KVStoreConsistencyTester {
         while (!Thread.currentThread().isInterrupted() && remainingRequestNumber.getCount() != 0) {
           remainingRequestNumber.countDown();
           sendRequest(client);
+          /*int millis = ThreadLocalRandom.current().nextInt(10);
+          try {
+            Thread.sleep(millis);
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+          }*/
         }
       })));
     }
