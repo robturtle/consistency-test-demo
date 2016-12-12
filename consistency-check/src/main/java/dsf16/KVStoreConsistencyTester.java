@@ -102,7 +102,7 @@ public class KVStoreConsistencyTester {
 
   private boolean isDebug = false;
 
-  private CountDownLatch remainingRequestNumber = new CountDownLatch(25000);
+  private CountDownLatch remainingRequestNumber = new CountDownLatch(30000);
 
   private int threadNumber = 20;
 
