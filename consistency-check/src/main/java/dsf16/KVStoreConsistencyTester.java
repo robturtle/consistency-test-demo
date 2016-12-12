@@ -165,12 +165,21 @@ public class KVStoreConsistencyTester {
     }
     try {
       analyst.analyze();
-      logger.info("No inconsistency detected...");
+      logger.info("No inconsistency detected in graph algorithm...");
       logger.info("To try harder please check -j and -n options");
+      if (fastChecker != null) {
+        logger.info("Use the rest of time to do more fast check...");
+        fastChecker.get();
+      }
       System.exit(0);
     } catch (CycleDetectedException e) {
       logger.info("Inconsistency detected!");
       System.exit(1);
+    } catch (InterruptedException ie) {
+      Thread.currentThread().interrupt();
+    } catch (ExecutionException ee) {
+      logger.warn("fast checker died abnormally. abort.");
+      System.exit(2);
     } finally {
       if (fastChecker != null) {
         fastChecker.cancel(true);
@@ -216,6 +225,7 @@ public class KVStoreConsistencyTester {
     requestSenderTimeoutStopper.submit(() -> {
       try {
         Thread.sleep(sendingTimeoutSeconds * 1000);
+        addingEntry.lock(); // intentionally no unlock
         logger.info("Stop sending requests...");
         for (Future<?> task : tasks) {
           task.cancel(true);
