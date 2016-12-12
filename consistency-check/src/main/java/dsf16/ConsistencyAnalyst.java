@@ -91,24 +91,29 @@ class ConsistencyAnalyst {
         (map, v) -> {
           if (v.getValue().isRead) {
             Vertex<RPCEntry> dictator = dictatorMap.get(v.getValue().value);
-            if (dictator == writer) { return null; }
-            for (Vertex<RPCEntry> w : writerStack) {
+            for (Vertex<RPCEntry> w : writerStack) if (w != dictator) {
               logger.debug("hybrid edge {} -> {}",
                 w.getValue().toString(),
-                //writer.getValue().toString(),
-                dictator.getValue().toString());
+                dictator.getValue());
               hybridEdgeNumber.incrementAndGet();
               ((Graph.Vertex<RPCEntry>)w).add_hybrid_edge_to(dictator);
-              //((Graph.Vertex<RPCEntry>)writer).add_hybrid_edge_to(dictator);
             }
           } else {
+            logger.debug("=> do writer {}", v.getValue().toString());
             metWriters.add(v);
             writerStack.push(v);
           }
           return null;
         },
         (map, v) -> {
-          if (!v.getValue().isRead) { writerStack.pop(); }
+          if (!v.getValue().isRead) {
+            if (v != writerStack.peek()) {
+              logger.error("Wanna pop {}, but pop {} instead", v.getValue().toString(), writerStack.peek().getValue());
+              throw new AssertionError();
+            }
+            logger.debug("<=out writer {}", v.getValue().toString());
+            writerStack.pop();
+          }
           return null;
         });
     }
