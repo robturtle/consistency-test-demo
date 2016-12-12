@@ -57,7 +57,7 @@ class ConsistencyAnalyst {
       if (readEntry.isRead) {
         Vertex<RPCEntry> writerVertex = dictatorMap.get(readEntry.value);
         if (writerVertex == null) {
-          logger.error("Read value with no dictator!");
+          logger.error("Read value {} with no dictator!", readEntry.value);
           throw new CycleDetectedException();
         }
         writerVertex.add_edge_to(readerVertex);
