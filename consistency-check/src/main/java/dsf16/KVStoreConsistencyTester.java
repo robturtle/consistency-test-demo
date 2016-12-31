@@ -219,16 +219,16 @@ public class KVStoreConsistencyTester {
           remainingRequestNumber.countDown();
           sendRequest(client);
         }
+        logger.info("Finished request sending");
       })));
     }
 
     requestSenderTimeoutStopper.submit(() -> {
       try {
         Thread.sleep(sendingTimeoutSeconds * 1000);
-        addingEntry.lock(); // intentionally no unlock
         logger.info("Sending phase timed out, stop sending requests...");
         for (Future<?> task : tasks) {
-          task.cancel(true);
+          task.cancel(false);
         }
         executorService.shutdownNow();
         executorService.awaitTermination(1, TimeUnit.SECONDS);
